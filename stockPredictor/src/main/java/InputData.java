@@ -14,7 +14,8 @@ import org.apache.poi.ss.usermodel.*;
 public class InputData {
     static Date startDate;
     final static Logger logger = Logger.getLogger(InputData.class);
-    Map<Integer, Double> dowJonesClosingMap = new HashMap<Integer, Double>();
+    //Map<Integer, Double> dowJonesClosingMap = new HashMap<Integer, Double>();
+    LinkedList<Double> dowJonesClosingList = new LinkedList<>();
     Map<Integer, Double> dowJonesClosingMapChangePercent = new HashMap<>();
 
     /**
@@ -31,6 +32,7 @@ public class InputData {
 
             br = new BufferedReader(new FileReader( filenameDowData));
             int dateDifference = -1;
+            Map<Integer, Double> dowJonesClosingMap = new HashMap<Integer, Double>();
             while ((line = br.readLine()) != null) {
 
                 // use comma as separator
@@ -61,6 +63,9 @@ public class InputData {
 
             }
             linearizeGaps(dowJonesClosingMap);
+            for (int i = 0; i<Collections.max(dowJonesClosingMap.keySet()); i++) {
+                dowJonesClosingList.add(dowJonesClosingMap.get(i));
+            }
             findPercentChangeOfDow();
         } catch (FileNotFoundException ex) {
             logger.error("File " +  filenameDowData + " not found: " + ex.getMessage());
@@ -100,9 +105,9 @@ public class InputData {
 
     private void findPercentChangeOfDow(){
         dowJonesClosingMapChangePercent.put(0, 0.0);
-        for (int i=1; i <Collections.max(dowJonesClosingMap.keySet()); i++) {
-            double previousValue =  dowJonesClosingMap.get(i-1);
-            dowJonesClosingMapChangePercent.put(i, (dowJonesClosingMap.get(i) - previousValue)/previousValue*100.0);
+        for (int i=1; i <dowJonesClosingList.size(); i++) {
+            double previousValue =  dowJonesClosingList.get(i-1);
+            dowJonesClosingMapChangePercent.put(i, (dowJonesClosingList.get(i) - previousValue)/previousValue*100.0);
         }
     }
 
@@ -111,21 +116,18 @@ public class InputData {
         return dowJonesClosingMapChangePercent;
     }
 
-    public Map<Integer, Double> getDowJonesClosingMap() {
-        return dowJonesClosingMap;
-    }
 
     /**
      * offload full dow jones into excel with date as days after start
      */
     public void printFullDowJonesClosing(){
         try (PrintWriter writer = new PrintWriter(new File("DJIScrap.csv"))) {
-            for (int i=0; i <Collections.max(dowJonesClosingMap.keySet()); i++) {
+            for (int i=0; i <dowJonesClosingList.size(); i++) {
 
                 StringBuilder sb = new StringBuilder();
                 sb.append(i);
                 sb.append(',');
-                sb.append(dowJonesClosingMap.get(i));
+                sb.append(dowJonesClosingList.get(i));
                 sb.append('\n');
 
                 writer.write(sb.toString());
@@ -135,6 +137,10 @@ public class InputData {
         } catch (FileNotFoundException ex) {
             logger.error(ex.getMessage(), ex);
         }
+    }
+
+    public LinkedList<Double> getDowJonesClosingList() {
+        return dowJonesClosingList;
     }
 
 }

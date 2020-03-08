@@ -12,7 +12,7 @@ public class InputDataTest {
     public void failedToFindFile()
     {
         InputData inputData = new InputData("fakeFile.csv");
-        assertEquals(inputData.getDowJonesClosingMap().size(), 0);
+        assertEquals(inputData.getDowJonesClosingList().size(), 0);
     }
 
     @Test
@@ -20,7 +20,7 @@ public class InputDataTest {
     {
         System.out.println("current directory: " + System.getProperty("user.dir"));
         InputData inputData = new InputData("target\\classes\\DJI.csv");
-        assertTrue(inputData.getDowJonesClosingMap().size()> 8838);
+        assertTrue(inputData.getDowJonesClosingList().size()> 8838);
     }
 
     @Test
@@ -28,7 +28,7 @@ public class InputDataTest {
     {
         System.out.println("current directory: " + System.getProperty("user.dir"));
         InputData inputData = new InputData("target\\classes\\DJI.csv");
-        assertEquals(1292.619995, inputData.getDowJonesClosingMap().get(0), 1e-6);
+        assertEquals(1292.619995, inputData.getDowJonesClosingList().get(0), 1e-6);
     }
 
     @Test
@@ -36,7 +36,7 @@ public class InputDataTest {
     {
         System.out.println("current directory: " + System.getProperty("user.dir"));
         InputData inputData = new InputData("target\\classes\\DJI.csv");
-        assertEquals(1260.27002, inputData.getDowJonesClosingMap().get(100), 1e-6);
+        assertEquals(1260.27002, inputData.getDowJonesClosingList().get(100), 1e-6);
     }
 
 
@@ -45,7 +45,7 @@ public class InputDataTest {
     {
         System.out.println("current directory: " + System.getProperty("user.dir"));
         InputData inputData = new InputData("target\\classes\\DJI.csv");
-        assertEquals(1281.839966, inputData.getDowJonesClosingMap().get(4), 1e-6);
+        assertEquals(1281.839966, inputData.getDowJonesClosingList().get(4), 1e-6);
     }
 
 
@@ -54,7 +54,7 @@ public class InputDataTest {
     {
         System.out.println("current directory: " + System.getProperty("user.dir"));
         InputData inputData = new InputData("target\\classes\\DJI.csv");
-        assertEquals(29234.0541995, inputData.getDowJonesClosingMap().get(12774), 1e-6);
+        assertEquals(29234.0541995, inputData.getDowJonesClosingList().get(12774), 1e-6);
     }
 
     @Test

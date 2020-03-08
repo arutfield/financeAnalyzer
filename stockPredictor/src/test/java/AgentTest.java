@@ -13,7 +13,7 @@ public class AgentTest {
         Byte hundredths = 0;
         Byte thousandths = 0;
         Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths );
-        Agent agent = new Agent(weight, inputData.getDowJonesClosingMap());
+        Agent agent = new Agent(weight, inputData.getDowJonesClosingList());
         assertEquals(126980104, agent.getFitnessValueDowPrediction(), 1);
 
     }
@@ -27,7 +27,7 @@ public class AgentTest {
         Byte hundredths = 0;
         Byte thousandths = 0;
         Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths );
-        Agent agent = new Agent(weight, inputData.getDowJonesClosingMap());
+        Agent agent = new Agent(weight, inputData.getDowJonesClosingList());
         assertEquals(12667439, agent.getFitnessValueDowPrediction(), 1);
 
     }

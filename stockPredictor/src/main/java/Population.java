@@ -15,7 +15,7 @@ public class Population {
         InputData inputData = new InputData(dowJonesDataFile);
         for (int i=0; i<numberOfAgents; i++) {
             Weight weight = new Weight();
-            Agent agent = new Agent(weight, inputData.getDowJonesClosingMap());
+            Agent agent = new Agent(weight, inputData.getDowJonesClosingList());
             agents.add(agent);
             logger.trace("agent created with weight " + weight.printWeightValue());
         }

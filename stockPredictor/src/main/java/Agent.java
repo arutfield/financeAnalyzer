@@ -1,6 +1,7 @@
 import org.apache.log4j.Logger;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.Map;
 
 public class Agent {
@@ -9,18 +10,27 @@ public class Agent {
     final static Logger logger = Logger.getLogger(Agent.class);
 
     public Agent(Weight lastDowClosingMultiplier,
-                 Map<Integer, Double> dowData) {
+                 LinkedList<Double> dowData) {
         this.lastDowClosingMultiplier = lastDowClosingMultiplier;
         this.fitnessValueDowPrediction = calculateFitnessPredictingDow(dowData);
         logger.debug("new agent created with last dow multiplier of " + lastDowClosingMultiplier.findValue()
                 + " and fitness value " + fitnessValueDowPrediction);
     }
 
-    private double calculateFitnessPredictingDow(Map<Integer, Double> dowClosingData) {
+    private double calculateFitnessPredictingDow(LinkedList<Double> dowClosingData) {
         double difference = 0;
-        for (int i = 1; i < Collections.max(dowClosingData.keySet()); i++) {
-            double estimate = lastDowClosingMultiplier.findValue() * dowClosingData.get(i - 1);
-            difference += Math.abs(estimate - dowClosingData.get(i));
+        int i=-1;
+        double prevData = 0;
+        for (Double dowData : dowClosingData) {
+            i++;
+            if (i == 0)
+            {
+                prevData = dowData;
+                continue;
+            }
+            double estimate = lastDowClosingMultiplier.findValue() * prevData;
+            difference += Math.abs(estimate - dowData);
+            prevData = dowData;
         }
         fitnessValueDowPrediction = difference;
         return fitnessValueDowPrediction;
