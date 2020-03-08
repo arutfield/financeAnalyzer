@@ -48,4 +48,41 @@ public class InputDataTest {
         assertEquals(1281.839966, inputData.getDowJonesClosingMap().get(4), 1e-6);
     }
 
+
+    @Test
+    public void predictDay12774()
+    {
+        System.out.println("current directory: " + System.getProperty("user.dir"));
+        InputData inputData = new InputData("target\\classes\\DJI.csv");
+        assertEquals(29234.0541995, inputData.getDowJonesClosingMap().get(12774), 1e-6);
+    }
+
+    @Test
+    public void findPercentChangeDay0(){
+        InputData inputData = new InputData("target\\classes\\DJI.csv");
+        assertEquals(0, inputData.getDowJonesClosingMapChangePercent().get(0), 1e-6);
+
+    }
+
+    @Test
+    public void findPercentChangeDay1(){
+        InputData inputData = new InputData("target\\classes\\DJI.csv");
+        assertEquals(-0.3666963, inputData.getDowJonesClosingMapChangePercent().get(1), 1e-6);
+
+    }
+
+    @Test
+    public void findPercentChangeDay2(){
+        InputData inputData = new InputData("target\\classes\\DJI.csv");
+        assertEquals(-0.086187, inputData.getDowJonesClosingMapChangePercent().get(2), 1e-6);
+
+    }
+
+    @Test
+    public void dumpInfo() {
+        InputData inputData = new InputData("target\\classes\\DJI.csv");
+        inputData.printFullDowJonesClosing();
+    }
+
+
 }

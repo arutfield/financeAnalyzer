@@ -109,4 +109,14 @@ public class WeightTest
         System.out.println("value string: " + valueString);
         assertTrue( valueString.equals("27.43"));
     }
-}
+    @Test
+    public void weightsOutOfBounds()
+    {
+        Byte tens = 12;
+        Byte ones = 17;
+        Byte tenths = -4;
+        Byte hundredths = 13;
+        Byte thousandths = -6;
+        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths);
+        assertEquals(0, weight.findValue(), 1e-12);
+    }}

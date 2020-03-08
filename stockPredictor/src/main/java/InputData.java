@@ -6,16 +6,21 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 
-
+/**
+ * Input data class. Stores all the known information that will be used
+ */
 public class InputData {
     static Date startDate;
     final static Logger logger = Logger.getLogger(InputData.class);
     Map<Integer, Double> dowJonesClosingMap = new HashMap<Integer, Double>();
+    Map<Integer, Double> dowJonesClosingMapChangePercent = new HashMap<>();
 
+    /**
+     * constructor
+     * @param filenameDowData name of file containing data for the dow jones
+     */
     public InputData(String filenameDowData) {
 
         BufferedReader br = null;
@@ -56,7 +61,7 @@ public class InputData {
 
             }
             linearizeGaps(dowJonesClosingMap);
-
+            findPercentChangeOfDow();
         } catch (FileNotFoundException ex) {
             logger.error("File " +  filenameDowData + " not found: " + ex.getMessage());
             ex.printStackTrace();
@@ -73,9 +78,6 @@ public class InputData {
         }
     }
 
-    public Map<Integer, Double> getDowJonesClosingMap() {
-        return dowJonesClosingMap;
-    }
 
     private void linearizeGaps(Map<Integer, Double> map) {
         int lastKnownKey = 0;
@@ -95,4 +97,44 @@ public class InputData {
             lastKnownKey = i;
         }
     }
+
+    private void findPercentChangeOfDow(){
+        dowJonesClosingMapChangePercent.put(0, 0.0);
+        for (int i=1; i <Collections.max(dowJonesClosingMap.keySet()); i++) {
+            double previousValue =  dowJonesClosingMap.get(i-1);
+            dowJonesClosingMapChangePercent.put(i, (dowJonesClosingMap.get(i) - previousValue)/previousValue*100.0);
+        }
+    }
+
+
+    public Map<Integer, Double> getDowJonesClosingMapChangePercent() {
+        return dowJonesClosingMapChangePercent;
+    }
+
+    public Map<Integer, Double> getDowJonesClosingMap() {
+        return dowJonesClosingMap;
+    }
+
+    /**
+     * offload full dow jones into excel with date as days after start
+     */
+    public void printFullDowJonesClosing(){
+        try (PrintWriter writer = new PrintWriter(new File("DJIScrap.csv"))) {
+            for (int i=0; i <Collections.max(dowJonesClosingMap.keySet()); i++) {
+
+                StringBuilder sb = new StringBuilder();
+                sb.append(i);
+                sb.append(',');
+                sb.append(dowJonesClosingMap.get(i));
+                sb.append('\n');
+
+                writer.write(sb.toString());
+            }
+            logger.info("done printing map to file");
+
+        } catch (FileNotFoundException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+    }
+
 }
