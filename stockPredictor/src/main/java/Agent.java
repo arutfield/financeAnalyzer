@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class Agent {
+
     private Weight lastDowClosingMultiplier;
     private double fitnessValueDowPrediction = 0;
     final static Logger logger = Logger.getLogger(Agent.class);
@@ -13,7 +14,7 @@ public class Agent {
                  LinkedList<Double> dowData) {
         this.lastDowClosingMultiplier = lastDowClosingMultiplier;
         this.fitnessValueDowPrediction = calculateFitnessPredictingDow(dowData);
-        logger.debug("new agent created with last dow multiplier of " + lastDowClosingMultiplier.findValue()
+        logger.trace("new agent created with last dow multiplier of " + lastDowClosingMultiplier.findValue()
                 + " and fitness value " + fitnessValueDowPrediction);
     }
 
@@ -40,5 +41,7 @@ public class Agent {
         return fitnessValueDowPrediction;
     }
 
-
+    public Weight getLastDowClosingMultiplier() {
+        return lastDowClosingMultiplier;
+    }
 }
