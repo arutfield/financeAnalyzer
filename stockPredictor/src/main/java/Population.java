@@ -13,32 +13,27 @@ public class Population {
             throw new Exception(message);
         }
         InputData inputData = new InputData(dowJonesDataFile);
-        for (int i=0; i<numberOfAgents; i++) {
+        for (int i = 0; i < numberOfAgents; i++) {
             Weight weight = new Weight();
-            Agent agent = new Agent(weight, inputData.getDowJonesClosingList());
+            Agent agent = new Agent(weight);
             agents.add(agent);
             logger.trace("agent created with weight " + weight.printWeightValue());
         }
+        orderAgentsByFitness();
     }
 
     /**
      * find the agent with the smallest fitness function
+     *
      * @return best agent
      */
     public Agent findBestAgent() {
-        Agent bestAgent = null;
-        double bestFitnessFunction = Double.POSITIVE_INFINITY;
-        for (Agent agent : agents) {
-            if (agent.getFitnessValueDowPrediction() < bestFitnessFunction) {
-                bestAgent = agent;
-                bestFitnessFunction = agent.getFitnessValueDowPrediction();
-            }
-        }
-        return bestAgent;
+        return agents.get(0);
     }
 
     /**
      * find the best two agents
+     *
      * @return best two agents
      * @throws Exception not enough agents
      */
@@ -48,34 +43,60 @@ public class Population {
             logger.error(message);
             throw new Exception(message);
         }
-        Agent[] bestPair = new Agent[2];
-        double bestFitnessFunction = Double.POSITIVE_INFINITY;
-        double secondBestFitnessFunction = Double.POSITIVE_INFINITY;
+        Agent[] bestPair = {agents.get(0), agents.get(1)};
+        return bestPair;
+    }
+
+    private void orderAgentsByFitness() {
+        LinkedList<Agent> orderedList = new LinkedList<>();
+        int counter = 0;
+        orderedList.add(agents.get(0));
         for (Agent agent : agents) {
-            if (agent.getFitnessValueDowPrediction() > secondBestFitnessFunction) {
+            counter++;
+            if (counter == 1) {
                 continue;
-            } else {
-                if (agent.getFitnessValueDowPrediction() > bestFitnessFunction
-                        && agent.getFitnessValueDowPrediction() < secondBestFitnessFunction) {
-                    // between best and second best
-                    secondBestFitnessFunction = agent.getFitnessValueDowPrediction();
-                    bestPair[1] = agent;
-                    logger.trace("new second best weight: " + agent.getLastDowClosingMultiplier().printWeightValue());
-                } else {
-                    // new best parent
-                    secondBestFitnessFunction = bestFitnessFunction;
-                    bestFitnessFunction = agent.getFitnessValueDowPrediction();
-                    bestPair[1] = bestPair[0];
-                    bestPair[0] = agent;
-                    logger.trace("new best weight: " + agent.getLastDowClosingMultiplier().printWeightValue());
+            }
+            int position = 0;
+            for (Agent orderedAgent : orderedList) {
+                if (agent.getFitnessValueDowPrediction() < orderedAgent.getFitnessValueDowPrediction()) {
+                    orderedList.add(position, agent);
+                    break;
                 }
+                position++;
             }
         }
-        return bestPair;
+        agents.clear();
+        agents = orderedList;
+    }
+
+    public Agent[] getWorstAgents(int numberOfAgents) throws Exception {
+        if (agents.size() < numberOfAgents) {
+            String message = "less than " + numberOfAgents + " agents found. Only " + agents.size() + " agents";
+            logger.error(message);
+            throw new Exception(message);
+        }
+        Agent worstAgents[] = new Agent[numberOfAgents];
+        for (int i = 0; i < numberOfAgents; i++) {
+            // get agents back in reverse order from worst to best
+            worstAgents[i] = agents.get(agents.size() - 1 - i);
+        }
+        return worstAgents;
     }
 
     public LinkedList<Agent> getAgents() {
         return agents;
     }
 
+    private void generateChildren(int numberOfChildren) throws Exception {
+        Agent[] parents = findFittestPair();
+        //number of weight attributes is 6, so range should be [0,7)
+        for (int i = 0; i < numberOfChildren; i++) {
+            int crossPoint = (int) Math.floor(Math.random() * 7);
+            Weight newDowMultiplier = new Weight(parents[0], parents[1], crossPoint);
+            Agent agent = new Agent(newDowMultiplier);
+            //replace worst agent that hasn't been replaced yet
+            agents.set(agents.size() - i, agent);
+        }
+        orderAgentsByFitness();
+    }
 }

@@ -10,10 +10,9 @@ public class Agent {
     private double fitnessValueDowPrediction = 0;
     final static Logger logger = Logger.getLogger(Agent.class);
 
-    public Agent(Weight lastDowClosingMultiplier,
-                 LinkedList<Double> dowData) {
+    public Agent(Weight lastDowClosingMultiplier) {
         this.lastDowClosingMultiplier = lastDowClosingMultiplier;
-        this.fitnessValueDowPrediction = calculateFitnessPredictingDow(dowData);
+        this.fitnessValueDowPrediction = calculateFitnessPredictingDow(InputData.getDowJonesClosingList());
         logger.trace("new agent created with last dow multiplier of " + lastDowClosingMultiplier.findValue()
                 + " and fitness value " + fitnessValueDowPrediction);
     }

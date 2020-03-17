@@ -12,18 +12,19 @@ import org.apache.poi.ss.usermodel.*;
  * Input data class. Stores all the known information that will be used
  */
 public class InputData {
-    static Date startDate;
-    final static Logger logger = Logger.getLogger(InputData.class);
+    private static Date startDate;
+    private final static Logger logger = Logger.getLogger(InputData.class);
     //Map<Integer, Double> dowJonesClosingMap = new HashMap<Integer, Double>();
-    LinkedList<Double> dowJonesClosingList = new LinkedList<>();
-    Map<Integer, Double> dowJonesClosingMapChangePercent = new HashMap<>();
+    private static LinkedList<Double> dowJonesClosingList = new LinkedList<>();
+    private static Map<Integer, Double> dowJonesClosingMapChangePercent = new HashMap<>();
 
     /**
      * constructor
      * @param filenameDowData name of file containing data for the dow jones
      */
     public InputData(String filenameDowData) {
-
+        dowJonesClosingList.clear();
+        dowJonesClosingMapChangePercent.clear();
         BufferedReader br = null;
         String line = "";
         String cvsSplitBy = ",";
@@ -112,7 +113,7 @@ public class InputData {
     }
 
 
-    public Map<Integer, Double> getDowJonesClosingMapChangePercent() {
+    public static Map<Integer, Double> getDowJonesClosingMapChangePercent() {
         return dowJonesClosingMapChangePercent;
     }
 
@@ -139,7 +140,7 @@ public class InputData {
         }
     }
 
-    public LinkedList<Double> getDowJonesClosingList() {
+    public static LinkedList<Double> getDowJonesClosingList() {
         return dowJonesClosingList;
     }
 
