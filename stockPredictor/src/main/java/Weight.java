@@ -29,28 +29,47 @@ public class Weight {
 
     }
 
-    public Weight(Agent parent1, Agent parent2, int crossPoint) throws Exception {
+    public Weight(Weight parent1, Weight parent2, int crossPoint, double mutationProbability) throws Exception {
         if (crossPoint < 0 || crossPoint > 6) {
             String message = "crosspoint of " + crossPoint + " is out of range";
+            logger.error(message);
+            throw new Exception(message);
+        }
+        if (mutationProbability < 0 || mutationProbability > 1.0) {
+            String message = "mutation probability of " + mutationProbability + " is out of range";
             logger.error(message);
             throw new Exception(message);
         }
 
         if (crossPoint > 0) {
             //parent1
-            this.isNegative = parent1.getLastDowClosingMultiplier().isNegative();
+            this.isNegative = parent1.isNegative();
         } else {
             //parent2
-            this.isNegative = parent2.getLastDowClosingMultiplier().isNegative();
+            this.isNegative = parent2.isNegative();
+        }
+        //allow mutations
+        if (Math.random() < mutationProbability) {
+            this.isNegative = (Math.random() < 0.5);
         }
 
         for (int i=0; i<5; i++) {
             if (crossPoint > i+1) {
                 //parent1
-                digits[i] = parent1.getLastDowClosingMultiplier().getDigit(i);
+                digits[i] = parent1.getDigit(i);
             } else {
                 //parent2
-                digits[i] = parent2.getLastDowClosingMultiplier().getDigit(i);
+                digits[i] = parent2.getDigit(i);
+            }
+
+            // allow mutations
+            if (Math.random() < mutationProbability) {
+                digits[i] = (byte) Math.floor(Math.random()*10);
+            }
+            if (digits[i] > 9 || digits[i] < 0) {
+                String message = "digit of " + digits[i] + " is out of bounds. May be code error";
+                logger.error(message);
+                throw new Exception(message);
             }
         }
 

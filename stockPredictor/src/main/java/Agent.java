@@ -1,36 +1,41 @@
 import org.apache.log4j.Logger;
 
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Map;
 
 public class Agent {
 
     private Weight lastDowClosingMultiplier;
+    private Weight lastDowClosingPercentMultiplier;
     private double fitnessValueDowPrediction = 0;
     final static Logger logger = Logger.getLogger(Agent.class);
 
-    public Agent(Weight lastDowClosingMultiplier) {
+    public Agent(Weight lastDowClosingMultiplier, Weight lastDowClosingPercentMultiplier) {
         this.lastDowClosingMultiplier = lastDowClosingMultiplier;
-        this.fitnessValueDowPrediction = calculateFitnessPredictingDow(InputData.getDowJonesClosingList());
+        this.lastDowClosingPercentMultiplier = lastDowClosingPercentMultiplier;
+        this.fitnessValueDowPrediction = calculateFitnessPredictingDow();
         logger.trace("new agent created with last dow multiplier of " + lastDowClosingMultiplier.findValue()
                 + " and fitness value " + fitnessValueDowPrediction);
     }
 
-    private double calculateFitnessPredictingDow(LinkedList<Double> dowClosingData) {
+    private double calculateFitnessPredictingDow() {
+        LinkedList<DataSample> dowClosingData = InputData.getAllDataList();
+
         double difference = 0;
         int i=-1;
         double prevData = 0;
-        for (Double dowData : dowClosingData) {
+        double prevPercentData = 0;
+        for (DataSample dataSample : dowClosingData) {
             i++;
             if (i == 0)
             {
-                prevData = dowData;
+                prevData = dataSample.dowJonesClosing;
+               // prevPercentData =
                 continue;
             }
-            double estimate = lastDowClosingMultiplier.findValue() * prevData;
-            difference += Math.abs(estimate - dowData);
-            prevData = dowData;
+            double estimate = lastDowClosingMultiplier.findValue() * prevData
+                    + lastDowClosingPercentMultiplier.findValue() * prevPercentData;
+            difference += Math.abs(estimate - dataSample.dowJonesClosing);
+            prevData = dataSample.dowJonesClosing;
         }
         fitnessValueDowPrediction = difference;
         return fitnessValueDowPrediction;
@@ -43,4 +48,9 @@ public class Agent {
     public Weight getLastDowClosingMultiplier() {
         return lastDowClosingMultiplier;
     }
+
+    public Weight getLastDowClosingPercentMultiplier() {
+        return lastDowClosingPercentMultiplier;
+    }
+
 }

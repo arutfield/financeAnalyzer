@@ -83,7 +83,9 @@ public class PopulationTest {
         assertTrue(agents[0].getFitnessValueDowPrediction() > agents[1].getFitnessValueDowPrediction());
         int count = 0;
         for (int i= 1; i<10; i++) {
-                assertTrue(agents[i].getFitnessValueDowPrediction() < agents[i-1].getFitnessValueDowPrediction());
+                System.out.println("fitness to compare: " + agents[i].getFitnessValueDowPrediction()
+                        + ", " + agents[i-1].getFitnessValueDowPrediction());
+                assertTrue(agents[i].getFitnessValueDowPrediction() <= agents[i-1].getFitnessValueDowPrediction());
         }
         for (Agent agent : population.getAgents()) {
             if (agent.getFitnessValueDowPrediction() > agents[9].getFitnessValueDowPrediction()) {
@@ -110,5 +112,23 @@ public class PopulationTest {
         } catch (Exception ex) {
             assertTrue(true);
         }
+    }
+
+
+    @Test
+    public void testGetGenerations() throws Exception {
+        int popSize = 200;
+        int numberOfGenerations = 35;
+        int numberOfNewChildren = 60;
+        Population population = new Population("target\\classes\\DJI.csv", popSize);
+        Agent bestAgent = population.getBestOfGenerations(numberOfGenerations, numberOfNewChildren);
+
+        Population population2 = new Population("target\\classes\\DJI.csv", popSize);
+        Agent bestAgent2 = population2.getBestOfGenerations(numberOfGenerations, numberOfNewChildren);
+
+        System.out.println("best weight: " + bestAgent.getLastDowClosingMultiplier().findValue()
+                + ", " + bestAgent2.getLastDowClosingMultiplier().findValue());
+        assertEquals(bestAgent.getLastDowClosingMultiplier().findValue(),
+                bestAgent2.getLastDowClosingMultiplier().findValue(), 0.002);
     }
 }

@@ -12,15 +12,29 @@ public class Population {
             logger.error(message);
             throw new Exception(message);
         }
-        InputData inputData = new InputData(dowJonesDataFile);
+        InputData.loadDowJonesClosing(dowJonesDataFile);
         for (int i = 0; i < numberOfAgents; i++) {
-            Weight weight = new Weight();
-            Agent agent = new Agent(weight);
+            Weight weight1 = new Weight();
+            Weight weight2 = new Weight();
+            Agent agent = new Agent(weight1, weight2);
             agents.add(agent);
-            logger.trace("agent created with weight " + weight.printWeightValue());
+            logger.trace("agent created with weights " + weight1.printWeightValue() + "," + weight2.printWeightValue());
         }
         orderAgentsByFitness();
     }
+
+    public Agent getBestOfGenerations(int numberOfGenerations, int numberOfChildren) throws Exception {
+        if (numberOfGenerations < 1) {
+            String message = "need at least one generation, have " + numberOfGenerations;
+            logger.error(message);
+            throw new Exception(message);
+        }
+        for (int i=0; i<numberOfGenerations; i++) {
+            generateChildren(numberOfChildren);
+        }
+        return findBestAgent();
+    }
+
 
     /**
      * find the agent with the smallest fitness function
@@ -47,6 +61,7 @@ public class Population {
         return bestPair;
     }
 
+
     private void orderAgentsByFitness() {
         LinkedList<Agent> orderedList = new LinkedList<>();
         int counter = 0;
@@ -57,16 +72,22 @@ public class Population {
                 continue;
             }
             int position = 0;
+            boolean foundSpot = false;
             for (Agent orderedAgent : orderedList) {
                 if (agent.getFitnessValueDowPrediction() < orderedAgent.getFitnessValueDowPrediction()) {
                     orderedList.add(position, agent);
+                    foundSpot = true;
                     break;
                 }
                 position++;
             }
+            if (!foundSpot) {
+                orderedList.add(agent);//add to end if it's the worst
+            }
         }
         agents.clear();
         agents = orderedList;
+        logger.debug("best agent in reordering: " + agents.get(0).getLastDowClosingMultiplier().findValue());
     }
 
     public Agent[] getWorstAgents(int numberOfAgents) throws Exception {
@@ -87,15 +108,21 @@ public class Population {
         return agents;
     }
 
-    private void generateChildren(int numberOfChildren) throws Exception {
+
+
+    public void generateChildren(int numberOfChildren) throws Exception {
         Agent[] parents = findFittestPair();
+        double mutationProbability = 0.1;
         //number of weight attributes is 6, so range should be [0,7)
         for (int i = 0; i < numberOfChildren; i++) {
-            int crossPoint = (int) Math.floor(Math.random() * 7);
-            Weight newDowMultiplier = new Weight(parents[0], parents[1], crossPoint);
-            Agent agent = new Agent(newDowMultiplier);
+            int crossPoint = (int) Math.floor(Math.random() * 14);
+            Weight newDowMultiplier = new Weight(parents[0].getLastDowClosingMultiplier(),
+                    parents[1].getLastDowClosingMultiplier(), Math.max(crossPoint - 7, 0), mutationProbability);
+            Weight newDowPercentMultiplier = new Weight(parents[0].getLastDowClosingPercentMultiplier(),
+                    parents[1].getLastDowClosingPercentMultiplier(), Math.max(crossPoint - 7, 0), mutationProbability);
+            Agent agent = new Agent(newDowMultiplier, newDowPercentMultiplier);
             //replace worst agent that hasn't been replaced yet
-            agents.set(agents.size() - i, agent);
+            agents.set(agents.size() - i - 1, agent);
         }
         orderAgentsByFitness();
     }
