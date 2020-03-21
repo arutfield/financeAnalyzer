@@ -1,17 +1,20 @@
 import org.apache.log4j.Logger;
 
+
 public class Weight {
     private boolean isNegative;
-    private byte[] digits = new byte[5];
+    private byte[] digits = new byte[NUM_DIGITS];
     private double value = Double.POSITIVE_INFINITY;//default as uncalculated
     final static Logger logger = Logger.getLogger(Weight.class);
+    private static final int NUM_DIGITS=6;
 
     enum digitEnum {
         TENS(0),
         ONES(1),
         TENTHS(2),
         HUNDREDTHS(3),
-        THOUSANDTHS(4);
+        THOUSANDTHS(4),
+        TENTHOUSANDTHS(5);
 
         private final int value;
         private digitEnum(int value) {
@@ -23,14 +26,14 @@ public class Weight {
         if (Math.random() > 0.5) {
             this.isNegative = true;
         }
-        for (int i=0; i<5; i++) {
+        for (int i=0; i<NUM_DIGITS; i++) {
             this.digits[i] = (byte) Math.floor(Math.random()*10);
         }
 
     }
 
     public Weight(Weight parent1, Weight parent2, int crossPoint, double mutationProbability) throws Exception {
-        if (crossPoint < 0 || crossPoint > 6) {
+        if (crossPoint < 0 || crossPoint > NUM_DIGITS + 1) {
             String message = "crosspoint of " + crossPoint + " is out of range";
             logger.error(message);
             throw new Exception(message);
@@ -53,7 +56,7 @@ public class Weight {
             this.isNegative = (Math.random() < 0.5);
         }
 
-        for (int i=0; i<5; i++) {
+        for (int i=0; i<NUM_DIGITS; i++) {
             if (crossPoint > i+1) {
                 //parent1
                 digits[i] = parent1.getDigit(i);
@@ -78,7 +81,7 @@ public class Weight {
     }
 
 
-    public Weight(boolean isNegative, byte tens, byte ones, byte tenths, byte hundredths, byte thousandths) {
+    public Weight(boolean isNegative, byte tens, byte ones, byte tenths, byte hundredths, byte thousandths, byte tenThousandths) {
         this.isNegative = isNegative;
         this.digits[digitEnum.TENS.value] = tens;
         if (tens < 0 || tens > 9) {
@@ -105,13 +108,18 @@ public class Weight {
             logger.warn("desired thousandths of " + thousandths + " is out of range");
             this.digits[digitEnum.THOUSANDTHS.value] = 0;
         }
+        this.digits[digitEnum.TENTHOUSANDTHS.value] = tenThousandths;
+        if (tenThousandths < 0 || tenThousandths > 9) {
+            logger.warn("desired ten thousandths of " + tenThousandths + " is out of range");
+            this.digits[digitEnum.TENTHOUSANDTHS.value] = 0;
+        }
     }
 
     public double findValue() {
         if (value == Double.POSITIVE_INFINITY) {
             value = 0;
             double multiplier = 10.0;
-            for (int i=0; i<5; i++) {
+            for (int i=0; i<NUM_DIGITS; i++) {
                 value += digits[i] * multiplier;
                 multiplier /= 10.0;
             }
@@ -131,9 +139,9 @@ public class Weight {
     }
 
     public byte getDigit(int digitNumber) {
-        if (digitNumber > 4) {
-            logger.warn("digit number is too high. Giving 4");
-            digitNumber = 4;
+        if (digitNumber > NUM_DIGITS - 1) {
+            logger.warn("digit number is too high. Giving " +(NUM_DIGITS - 1));
+            digitNumber = NUM_DIGITS - 1;
         }
         return digits[digitNumber];
     }

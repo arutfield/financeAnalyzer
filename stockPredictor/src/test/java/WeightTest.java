@@ -16,7 +16,8 @@ public class WeightTest
         Byte tenths = 0;
         Byte hundredths = 0;
         Byte thousandths = 0;
-        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths);
+        Byte tenThousandths = 0;
+        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths, tenThousandths);
         assertEquals( weight.findValue(), 0, 1e-6 );
     }
 
@@ -28,7 +29,8 @@ public class WeightTest
         Byte tenths = 0;
         Byte hundredths = 0;
         Byte thousandths = 0;
-        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths);
+        Byte tenThousandths = 0;
+        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths, tenThousandths);
         assertEquals( weight.findValue(), 1, 1e-6 );
     }
 
@@ -40,7 +42,9 @@ public class WeightTest
         Byte tenths = 0;
         Byte hundredths = 0;
         Byte thousandths = 0;
-        Weight weight = new Weight(true, tens, ones, tenths, hundredths, thousandths);
+        Byte tenThousandths = 0;
+
+        Weight weight = new Weight(true, tens, ones, tenths, hundredths, thousandths, tenThousandths);
         assertEquals( weight.findValue(), -1, 1e-6 );
     }
 
@@ -52,8 +56,10 @@ public class WeightTest
         Byte tenths = 2;
         Byte hundredths = 1;
         Byte thousandths = 5;
-        Weight weight = new Weight(true, tens, ones, tenths, hundredths, thousandths);
-        assertEquals( weight.findValue(), -31.215, 1e-6 );
+        Byte tenThousandths = 6;
+
+        Weight weight = new Weight(true, tens, ones, tenths, hundredths, thousandths, tenThousandths);
+        assertEquals( weight.findValue(), -31.2156, 1e-6 );
     }
 
     @Test
@@ -64,8 +70,10 @@ public class WeightTest
         Byte tenths = 2;
         Byte hundredths = 1;
         Byte thousandths = 5;
-        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths);
-        assertEquals( weight.findValue(), 31.215, 1e-6 );
+        Byte tenThousandths = 6;
+
+        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths, tenThousandths);
+        assertEquals( weight.findValue(), 31.2156, 1e-6 );
     }
 
     @Test
@@ -76,7 +84,9 @@ public class WeightTest
         Byte tenths = 2;
         Byte hundredths = 1;
         Byte thousandths = 5;
-        Weight weight = new Weight(true, tens, ones, tenths, hundredths, thousandths);
+        Byte tenThousandths = 4;
+
+        Weight weight = new Weight(true, tens, ones, tenths, hundredths, thousandths, tenThousandths);
         double value1 = weight.findValue();
         assertEquals( weight.findValue(), value1, 1e-6 );
     }
@@ -90,9 +100,11 @@ public class WeightTest
         Byte tenths = 2;
         Byte hundredths = 1;
         Byte thousandths = 5;
-        Weight weight = new Weight(true, tens, ones, tenths, hundredths, thousandths);
+        Byte tenThousandths = 6;
+
+        Weight weight = new Weight(true, tens, ones, tenths, hundredths, thousandths, tenThousandths);
         String valueString = weight.printWeightValue();
-        assertTrue( valueString.equals("-31.215"));
+        assertTrue( valueString.equals("-31.2156"));
     }
 
     @Test
@@ -103,7 +115,9 @@ public class WeightTest
         Byte tenths = 4;
         Byte hundredths = 3;
         Byte thousandths = 0;
-        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths);
+        Byte tenThousandths = 0;
+
+        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths, tenThousandths);
         String valueString = weight.printWeightValue();
         System.out.println("value string: " + valueString);
         assertTrue( valueString.equals("27.43"));
@@ -117,7 +131,9 @@ public class WeightTest
         Byte tenths = -4;
         Byte hundredths = 13;
         Byte thousandths = -6;
-        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths);
+        Byte tenThousandths = 0;
+
+        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths, tenThousandths);
         assertEquals(0, weight.findValue(), 1e-12);
     }
 
@@ -128,9 +144,11 @@ public class WeightTest
         Byte tenths = 4;
         Byte hundredths = 3;
         Byte thousandths = 6;
-        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths);
-        assertEquals(11.436, weight.findValue(), 1e-12);
-        Agent agent = new Agent(weight, getZeroWeight());
+        Byte tenThousandths = 2;
+
+        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths, tenThousandths);
+        assertEquals(11.4362, weight.findValue(), 1e-12);
+        Agent agent = new Agent(weight, getZeroWeight(), getZeroWeight());
 
 
         Byte tens2 = 2;
@@ -138,9 +156,11 @@ public class WeightTest
         Byte tenths2 = 3;
         Byte hundredths2 = 1;
         Byte thousandths2 = 0;
-        Weight weight2 = new Weight(true, tens2, ones2, tenths2, hundredths2, thousandths2);
-        assertEquals(-27.31, weight2.findValue(), 1e-12);
-        Agent agent1 = new Agent(weight2, getZeroWeight());
+        Byte tenThousandths2 = 6;
+
+        Weight weight2 = new Weight(true, tens2, ones2, tenths2, hundredths2, thousandths2, tenThousandths2);
+        assertEquals(-27.3106, weight2.findValue(), 1e-12);
+        Agent agent1 = new Agent(weight2, getZeroWeight(), getZeroWeight());
         Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),0, 0);
 
         assertEquals(weight2.isNegative(), childWeight.isNegative());
@@ -158,9 +178,11 @@ public class WeightTest
         Byte tenths = 4;
         Byte hundredths = 3;
         Byte thousandths = 6;
-        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths);
-        assertEquals(11.436, weight.findValue(), 1e-12);
-        Agent agent = new Agent(weight, getZeroWeight());
+        Byte tenThousandths = 6;
+
+        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths, tenThousandths);
+        assertEquals(11.4366, weight.findValue(), 1e-12);
+        Agent agent = new Agent(weight, getZeroWeight(), getZeroWeight());
 
 
         Byte tens2 = 2;
@@ -168,9 +190,11 @@ public class WeightTest
         Byte tenths2 = 3;
         Byte hundredths2 = 1;
         Byte thousandths2 = 0;
-        Weight weight2 = new Weight(true, tens2, ones2, tenths2, hundredths2, thousandths2);
-        assertEquals(-27.31, weight2.findValue(), 1e-12);
-        Agent agent1 = new Agent(weight2, getZeroWeight());
+        Byte tenThousandths2 = 6;
+
+        Weight weight2 = new Weight(true, tens2, ones2, tenths2, hundredths2, thousandths2, tenThousandths2);
+        assertEquals(-27.3106, weight2.findValue(), 1e-12);
+        Agent agent1 = new Agent(weight2, getZeroWeight(), getZeroWeight());
         Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),1, 0);
 
         assertEquals(weight.isNegative(), childWeight.isNegative());
@@ -182,179 +206,108 @@ public class WeightTest
     }
     @Test
     public void parentMerge2() throws Exception {
-        Byte tens = 1;
-        Byte ones = 1;
-        Byte tenths = 4;
-        Byte hundredths = 3;
-        Byte thousandths = 6;
-        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths);
-        assertEquals(11.436, weight.findValue(), 1e-12);
-        Agent agent = new Agent(weight, getZeroWeight());
+
+        assertEquals(11.4363, getWeight11Point4363().findValue(), 1e-12);
+        Agent agent = new Agent(getWeight11Point4363(), getZeroWeight(), getZeroWeight());
 
 
-        Byte tens2 = 2;
-        Byte ones2 = 7;
-        Byte tenths2 = 3;
-        Byte hundredths2 = 1;
-        Byte thousandths2 = 0;
-        Weight weight2 = new Weight(true, tens2, ones2, tenths2, hundredths2, thousandths2);
-        assertEquals(-27.31, weight2.findValue(), 1e-12);
-        Agent agent1 = new Agent(weight2, getZeroWeight());
+        assertEquals(-27.3105, getWeightNeg27Point3105().findValue(), 1e-12);
+        Agent agent1 = new Agent(getWeightNeg27Point3105(), getZeroWeight(), getZeroWeight());
         Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),2, 0);
 
-        assertEquals(weight.isNegative(), childWeight.isNegative());
-        assertEquals(tens, childWeight.getDigit(0), 1e-6);
-        assertEquals(ones2, childWeight.getDigit(1), 1e-6);
-        assertEquals(tenths2, childWeight.getDigit(2), 1e-6);
-        assertEquals(hundredths2, childWeight.getDigit(3), 1e-6);
-        assertEquals(thousandths2, childWeight.getDigit(4), 1e-6);
+        assertEquals(getWeight11Point4363().isNegative(), childWeight.isNegative());
+        assertEquals(getWeight11Point4363().getDigit(0), childWeight.getDigit(0), 1e-6);
+        assertEquals(getWeightNeg27Point3105().getDigit(1), childWeight.getDigit(1), 1e-6);
+        assertEquals(getWeightNeg27Point3105().getDigit(2), childWeight.getDigit(2), 1e-6);
+        assertEquals(getWeightNeg27Point3105().getDigit(3), childWeight.getDigit(3), 1e-6);
+        assertEquals(getWeightNeg27Point3105().getDigit(4), childWeight.getDigit(4), 1e-6);
     }
 
 
     @Test
     public void parentMerge3() throws Exception {
-        Byte tens = 1;
-        Byte ones = 1;
-        Byte tenths = 4;
-        Byte hundredths = 3;
-        Byte thousandths = 6;
-        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths);
-        assertEquals(11.436, weight.findValue(), 1e-12);
-        Agent agent = new Agent(weight, getZeroWeight());
+        assertEquals(11.4363, getWeight11Point4363().findValue(), 1e-12);
+        Agent agent = new Agent(getWeight11Point4363(), getZeroWeight(), getZeroWeight());
 
 
-        Byte tens2 = 2;
-        Byte ones2 = 7;
-        Byte tenths2 = 3;
-        Byte hundredths2 = 1;
-        Byte thousandths2 = 0;
-        Weight weight2 = new Weight(true, tens2, ones2, tenths2, hundredths2, thousandths2);
-        assertEquals(-27.31, weight2.findValue(), 1e-12);
-        Agent agent1 = new Agent(weight2, getZeroWeight());
+        assertEquals(-27.3105, getWeightNeg27Point3105().findValue(), 1e-12);
+        Agent agent1 = new Agent(getWeightNeg27Point3105(), getZeroWeight(), getZeroWeight());
         Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),3, 0);
 
-        assertEquals(weight.isNegative(), childWeight.isNegative());
-        assertEquals(tens, childWeight.getDigit(0), 1e-6);
-        assertEquals(ones, childWeight.getDigit(1), 1e-6);
-        assertEquals(tenths2, childWeight.getDigit(2), 1e-6);
-        assertEquals(hundredths2, childWeight.getDigit(3), 1e-6);
-        assertEquals(thousandths2, childWeight.getDigit(4), 1e-6);
+        assertEquals(getWeight11Point4363().isNegative(), childWeight.isNegative());
+        assertEquals(getWeight11Point4363().getDigit(0), childWeight.getDigit(0), 1e-6);
+        assertEquals(getWeight11Point4363().getDigit(1), childWeight.getDigit(1), 1e-6);
+        assertEquals(getWeightNeg27Point3105().getDigit(2), childWeight.getDigit(2), 1e-6);
+        assertEquals(getWeightNeg27Point3105().getDigit(3), childWeight.getDigit(3), 1e-6);
+        assertEquals(getWeightNeg27Point3105().getDigit(4), childWeight.getDigit(4), 1e-6);
     }
 
     @Test
     public void parentMerge4() throws Exception {
-        Byte tens = 1;
-        Byte ones = 1;
-        Byte tenths = 4;
-        Byte hundredths = 3;
-        Byte thousandths = 6;
-        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths);
-        assertEquals(11.436, weight.findValue(), 1e-12);
-        Agent agent = new Agent(weight, getZeroWeight());
+        assertEquals(11.4363, getWeight11Point4363().findValue(), 1e-12);
+        Agent agent = new Agent(getWeight11Point4363(), getZeroWeight(), getZeroWeight());
 
 
-        Byte tens2 = 2;
-        Byte ones2 = 7;
-        Byte tenths2 = 3;
-        Byte hundredths2 = 1;
-        Byte thousandths2 = 0;
-        Weight weight2 = new Weight(true, tens2, ones2, tenths2, hundredths2, thousandths2);
-        assertEquals(-27.31, weight2.findValue(), 1e-12);
-        Agent agent1 = new Agent(weight2, getZeroWeight());
+        assertEquals(-27.3105, getWeightNeg27Point3105().findValue(), 1e-12);
+        Agent agent1 = new Agent(getWeightNeg27Point3105(), getZeroWeight(), getZeroWeight());
         Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),4, 0);
 
-        assertEquals(weight.isNegative(), childWeight.isNegative());
-        assertEquals(tens, childWeight.getDigit(0), 1e-6);
-        assertEquals(ones, childWeight.getDigit(1), 1e-6);
-        assertEquals(tenths, childWeight.getDigit(2), 1e-6);
-        assertEquals(hundredths2, childWeight.getDigit(3), 1e-6);
-        assertEquals(thousandths2, childWeight.getDigit(4), 1e-6);
+        assertEquals(getWeight11Point4363().isNegative(), childWeight.isNegative());
+        assertEquals(getWeight11Point4363().getDigit(0), childWeight.getDigit(0), 1e-6);
+        assertEquals(getWeight11Point4363().getDigit(1), childWeight.getDigit(1), 1e-6);
+        assertEquals(getWeight11Point4363().getDigit(2), childWeight.getDigit(2), 1e-6);
+        assertEquals(getWeightNeg27Point3105().getDigit(3), childWeight.getDigit(3), 1e-6);
+        assertEquals(getWeightNeg27Point3105().getDigit(4), childWeight.getDigit(4), 1e-6);
     }
 
     @Test
     public void parentMerge5() throws Exception {
-        Byte tens = 1;
-        Byte ones = 1;
-        Byte tenths = 4;
-        Byte hundredths = 3;
-        Byte thousandths = 6;
-        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths);
-        assertEquals(11.436, weight.findValue(), 1e-12);
-        Agent agent = new Agent(weight, getZeroWeight());
+        assertEquals(11.4363, getWeight11Point4363().findValue(), 1e-12);
+        Agent agent = new Agent(getWeight11Point4363(), getZeroWeight(), getZeroWeight());
 
 
-        Byte tens2 = 2;
-        Byte ones2 = 7;
-        Byte tenths2 = 3;
-        Byte hundredths2 = 1;
-        Byte thousandths2 = 0;
-        Weight weight2 = new Weight(true, tens2, ones2, tenths2, hundredths2, thousandths2);
-        assertEquals(-27.31, weight2.findValue(), 1e-12);
-        Agent agent1 = new Agent(weight2, getZeroWeight());
+        assertEquals(-27.3105, getWeightNeg27Point3105().findValue(), 1e-12);
+        Agent agent1 = new Agent(getWeightNeg27Point3105(), getZeroWeight(), getZeroWeight());
         Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),
                 5, 0);
 
-        assertEquals(weight.isNegative(), childWeight.isNegative());
-        assertEquals(tens, childWeight.getDigit(0), 1e-6);
-        assertEquals(ones, childWeight.getDigit(1), 1e-6);
-        assertEquals(tenths, childWeight.getDigit(2), 1e-6);
-        assertEquals(hundredths, childWeight.getDigit(3), 1e-6);
-        assertEquals(thousandths2, childWeight.getDigit(4), 1e-6);
+        assertEquals(getWeight11Point4363().isNegative(), childWeight.isNegative());
+        assertEquals(getWeight11Point4363().getDigit(0), childWeight.getDigit(0), 1e-6);
+        assertEquals(getWeight11Point4363().getDigit(1), childWeight.getDigit(1), 1e-6);
+        assertEquals(getWeight11Point4363().getDigit(2), childWeight.getDigit(2), 1e-6);
+        assertEquals(getWeight11Point4363().getDigit(3), childWeight.getDigit(3), 1e-6);
+        assertEquals(getWeightNeg27Point3105().getDigit(4), childWeight.getDigit(4), 1e-6);
     }
 
     @Test
     public void parentMerge6() throws Exception {
-        Byte tens = 1;
-        Byte ones = 1;
-        Byte tenths = 4;
-        Byte hundredths = 3;
-        Byte thousandths = 6;
-        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths);
-        assertEquals(11.436, weight.findValue(), 1e-12);
-        Agent agent = new Agent(weight, getZeroWeight());
+        assertEquals(11.4363, getWeight11Point4363().findValue(), 1e-12);
+        Agent agent = new Agent(getWeight11Point4363(), getZeroWeight(), getZeroWeight());
 
 
-        Byte tens2 = 2;
-        Byte ones2 = 7;
-        Byte tenths2 = 3;
-        Byte hundredths2 = 1;
-        Byte thousandths2 = 0;
-        Weight weight2 = new Weight(true, tens2, ones2, tenths2, hundredths2, thousandths2);
-        assertEquals(-27.31, weight2.findValue(), 1e-12);
-        Agent agent1 = new Agent(weight2, getZeroWeight());
+        assertEquals(-27.3105, getWeightNeg27Point3105().findValue(), 1e-12);
+        Agent agent1 = new Agent(getWeightNeg27Point3105(), getZeroWeight(), getZeroWeight());
         Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),6, 0);
 
-        assertEquals(weight.isNegative(), childWeight.isNegative());
-        assertEquals(tens, childWeight.getDigit(0), 1e-6);
-        assertEquals(ones, childWeight.getDigit(1), 1e-6);
-        assertEquals(tenths, childWeight.getDigit(2), 1e-6);
-        assertEquals(hundredths, childWeight.getDigit(3), 1e-6);
-        assertEquals(thousandths, childWeight.getDigit(4), 1e-6);
+        assertEquals(getWeight11Point4363().isNegative(), childWeight.isNegative());
+        assertEquals(getWeight11Point4363().getDigit(0), childWeight.getDigit(0), 1e-6);
+        assertEquals(getWeight11Point4363().getDigit(1), childWeight.getDigit(1), 1e-6);
+        assertEquals(getWeight11Point4363().getDigit(2), childWeight.getDigit(2), 1e-6);
+        assertEquals(getWeight11Point4363().getDigit(3), childWeight.getDigit(3), 1e-6);
+        assertEquals(getWeight11Point4363().getDigit(4), childWeight.getDigit(4), 1e-6);
     }
 
     @Test
     public void parentMerge7() throws Exception {
-        Byte tens = 1;
-        Byte ones = 1;
-        Byte tenths = 4;
-        Byte hundredths = 3;
-        Byte thousandths = 6;
-        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths);
-        assertEquals(11.436, weight.findValue(), 1e-12);
-        Agent agent = new Agent(weight, getZeroWeight());
+        assertEquals(11.4363, getWeight11Point4363().findValue(), 1e-12);
+        Agent agent = new Agent(getWeight11Point4363(), getZeroWeight(), getZeroWeight());
 
 
-        Byte tens2 = 2;
-        Byte ones2 = 7;
-        Byte tenths2 = 3;
-        Byte hundredths2 = 1;
-        Byte thousandths2 = 0;
-        Weight weight2 = new Weight(true, tens2, ones2, tenths2, hundredths2, thousandths2);
-        assertEquals(-27.31, weight2.findValue(), 1e-12);
-        Agent agent1 = new Agent(weight2, getZeroWeight());
+        assertEquals(-27.3105, getWeightNeg27Point3105().findValue(), 1e-12);
+        Agent agent1 = new Agent(getWeightNeg27Point3105(), getZeroWeight(), getZeroWeight());
         try {
             Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),
-                    7, 0);
+                    8, 0);
             assertFalse(true);
         }
         catch(Exception ex){
@@ -365,7 +318,30 @@ public class WeightTest
 
     private Weight getZeroWeight(){
         Byte tens2 = 0;
-        return new Weight(true, tens2, tens2, tens2, tens2, tens2);
+        return new Weight(true, tens2, tens2, tens2, tens2, tens2, tens2);
+
+    }
+
+    private Weight getWeight11Point4363(){
+        Byte tens = 1;
+        Byte ones = 1;
+        Byte tenths = 4;
+        Byte hundredths = 3;
+        Byte thousandths = 6;
+        Byte tenThousandths = 3;
+
+        return new Weight(false, tens, ones, tenths, hundredths, thousandths, tenThousandths);
+
+    }
+
+    private Weight getWeightNeg27Point3105() {
+        Byte tens2 = 2;
+        Byte ones2 = 7;
+        Byte tenths2 = 3;
+        Byte hundredths2 = 1;
+        Byte thousandths2 = 0;
+        Byte tenThousandths2 = 5;
+        return  new Weight(true, tens2, ones2, tenths2, hundredths2, thousandths2, tenThousandths2);
 
     }
 }

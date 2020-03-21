@@ -12,10 +12,11 @@ import javax.xml.crypto.Data;
 class DataSample {
    double dowJonesClosing;
    double dowJonesClosingPercent;
-
-    public DataSample(Double dowJonesClosing, double dowJonesClosingPercent) {
+   double unemploymentRate;
+    public DataSample(Double dowJonesClosing, double dowJonesClosingPercent, double unemploymentRate) {
         this.dowJonesClosing = dowJonesClosing;
         this.dowJonesClosingPercent = dowJonesClosingPercent;
+        this.unemploymentRate = unemploymentRate;
     }
 }
 
@@ -29,20 +30,22 @@ public class InputData {
 //    private static LinkedList<Double> dowJonesClosingList = new LinkedList<>();
  //   private static Map<Integer, Double> dowJonesClosingMapChangePercent = new HashMap<>();
     private static LinkedList<DataSample> allDataByDateList = new LinkedList<>();
-
     /**
      * constructor
      */
     public InputData() {
     }
 
-    public static void loadDowJonesClosing(String filenameDowData) {
+    public static void loadDowJonesClosing(String filenameDowData, String unemploymentDataFileName) {
         allDataByDateList.clear();
         BufferedReader br = null;
+        BufferedReader brUE = null;
         String line = "";
         String cvsSplitBy = ",";
 
         try {
+
+            //read in dow data
 
             br = new BufferedReader(new FileReader(filenameDowData));
             int dateDifference = -1;
@@ -75,21 +78,51 @@ public class InputData {
 
 
             }
+
+
+            //read in unemployment data
+
+            brUE = new BufferedReader(new FileReader(unemploymentDataFileName));
+            dateDifference = -1;
+            Map<Integer, Double> unemploymentMap = new HashMap<Integer, Double>();
+            while ((line = brUE.readLine()) != null) {
+
+                // use comma as separator
+                String[] data = line.split(cvsSplitBy);
+                String dateOfUnemployment = data[0];
+                try {
+                    int prevDateDifference = dateDifference;
+                    Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(dateOfUnemployment);
+
+                    dateDifference = (int) ((date1.getTime() - startDate.getTime()) / (1000.0 * 60 * 60 * 24));
+                    unemploymentMap.put(dateDifference, Double.valueOf(data[1]));
+                    logger.trace("added unemployment " + dateDifference + " for " + date1.toString() + ", "
+                            + unemploymentMap.get(dateDifference)
+                            + " to map");
+                    int dateRateOfChange = dateDifference - prevDateDifference;
+                } catch (ParseException ex) {
+                    continue;
+                }
+            }
+
             linearizeGaps(dowJonesClosingMap);
+            fillMapBasedOnPrevious(unemploymentMap, Collections.max(dowJonesClosingMap.keySet()));
             for (int i = 0; i < Collections.max(dowJonesClosingMap.keySet()); i++) {
                 if (i == 0){
-                    allDataByDateList.add(new DataSample(dowJonesClosingMap.get(i), 0.0 ));
+                    allDataByDateList.add(new DataSample(dowJonesClosingMap.get(i), 0.0, unemploymentMap.get(i) ));
                 } else {
                     double previousDowValue = allDataByDateList.get(i - 1).dowJonesClosing;
                     double dowJonesClosingPercentChange = (dowJonesClosingMap.get(i) - previousDowValue) / previousDowValue * 100.0;
-                    allDataByDateList.add(new DataSample(dowJonesClosingMap.get(i), dowJonesClosingPercentChange));
+                    allDataByDateList.add(new DataSample(dowJonesClosingMap.get(i), dowJonesClosingPercentChange, unemploymentMap.get(i)));
                 }
             }
         } catch (FileNotFoundException ex) {
             logger.error("File " + filenameDowData + " not found: " + ex.getMessage());
             ex.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         } finally {
             if (br != null) {
                 try {
@@ -99,6 +132,12 @@ public class InputData {
                 }
             }
         }
+
+
+
+
+
+
     }
 
 
@@ -122,14 +161,34 @@ public class InputData {
         }
     }
 
-
+   private static void fillMapBasedOnPrevious(Map<Integer, Double> map, int dowJonesMapSize) throws Exception {
+       int lastKnownKey = 0;
+       for (int i = 0; i < dowJonesMapSize; i++) {
+           if (map.containsKey(i)) {
+               lastKnownKey = i;
+               continue;
+           }
+           int j = 0;
+           while (!map.containsKey(i - j)) {
+               j++;
+               if (j > 31) {
+                   String message = "too many days back. Shouldn't be > 31";
+                   logger.error(message);
+                   throw new Exception(message);
+               }
+           }
+           map.put(i, map.get(i-j));
+           logger.trace("added unemployment day " + i + " with value " + map.get(i - j));
+           lastKnownKey = i;
+       }
+   }
 
 
     /**
      * offload full dow jones into excel with date as days after start
      */
     public static void printFullDowJonesClosing() {
-        try (PrintWriter writer = new PrintWriter(new File("DJIScrap.csv"))) {
+        try (PrintWriter writer = new PrintWriter(new File("allData.csv"))) {
             int i=0;
             for (DataSample sample : allDataByDateList) {
 
@@ -139,9 +198,12 @@ public class InputData {
                 sb.append(sample.dowJonesClosing);
                 sb.append(',');
                 sb.append(sample.dowJonesClosingPercent);
+                sb.append(',');
+                sb.append(sample.unemploymentRate);
                 sb.append('\n');
 
                 writer.write(sb.toString());
+                i++;
             }
             logger.info("done printing map to file");
 

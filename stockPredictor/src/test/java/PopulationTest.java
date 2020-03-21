@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 public class PopulationTest {
     @Test
     public void createPopulation() throws Exception {
-        Population population = new Population("target\\classes\\DJI.csv", 10000);
+        Population population = createPopulation( 10000);
         Agent agent = population.findBestAgent();
         System.out.println("best agent weight: " + agent.getLastDowClosingMultiplier().printWeightValue());
         assertTrue(true);
@@ -13,7 +13,7 @@ public class PopulationTest {
 
     @Test
     public void findBestPair() throws Exception {
-        Population population = new Population("target\\classes\\DJI.csv", 10000);
+        Population population = createPopulation(10000);
         Agent[] agents = population.findFittestPair();
         System.out.println("best agent weight: " + agents[0].getLastDowClosingMultiplier().printWeightValue());
         System.out.println("best agent 2 weight: " + agents[1].getLastDowClosingMultiplier().printWeightValue());
@@ -38,7 +38,7 @@ public class PopulationTest {
 
     @Test
     public void findBestPairError() throws Exception {
-        Population population = new Population("target\\classes\\DJI.csv", 1);
+        Population population = createPopulation(1);
         boolean success = true;
         try {
 
@@ -52,7 +52,7 @@ public class PopulationTest {
 
     @Test
     public void findWorstPair() throws Exception {
-        Population population = new Population("target\\classes\\DJI.csv", 10000);
+        Population population = createPopulation(10000);
         Agent[] agents = population.getWorstAgents(2);
         System.out.println("worst agent weight: " + agents[0].getLastDowClosingMultiplier().printWeightValue());
         System.out.println("worst agent 2 weight: " + agents[1].getLastDowClosingMultiplier().printWeightValue());
@@ -76,7 +76,7 @@ public class PopulationTest {
 
     @Test
     public void findWorstTen() throws Exception {
-        Population population = new Population("target\\classes\\DJI.csv", 10000);
+        Population population = createPopulation(10000);
         Agent[] agents = population.getWorstAgents(10);
         System.out.println("worst agent weight: " + agents[0].getLastDowClosingMultiplier().printWeightValue());
         System.out.println("worst agent 2 weight: " + agents[1].getLastDowClosingMultiplier().printWeightValue());
@@ -106,7 +106,7 @@ public class PopulationTest {
     @Test
     public void findWorstError() {
         try {
-            Population population = new Population("target\\classes\\DJI.csv", 8);
+            Population population = createPopulation(8);
             Agent[] agents = population.getWorstAgents(10);
             assertFalse(false);
         } catch (Exception ex) {
@@ -117,18 +117,31 @@ public class PopulationTest {
 
     @Test
     public void testGetGenerations() throws Exception {
-        int popSize = 200;
-        int numberOfGenerations = 35;
-        int numberOfNewChildren = 60;
-        Population population = new Population("target\\classes\\DJI.csv", popSize);
+        int popSize = 500;
+        int numberOfGenerations = 50;
+        int numberOfNewChildren = 200;
+        Population population = createPopulation(popSize);
         Agent bestAgent = population.getBestOfGenerations(numberOfGenerations, numberOfNewChildren);
 
-        Population population2 = new Population("target\\classes\\DJI.csv", popSize);
+        Population population2 = createPopulation(popSize);
         Agent bestAgent2 = population2.getBestOfGenerations(numberOfGenerations, numberOfNewChildren);
 
-        System.out.println("best weight: " + bestAgent.getLastDowClosingMultiplier().findValue()
-                + ", " + bestAgent2.getLastDowClosingMultiplier().findValue());
+        System.out.println("agent 1 weights: " + bestAgent.getLastDowClosingMultiplier().findValue()
+                + ", " + bestAgent.getLastDowClosingPercentMultiplier().findValue()
+                + ", " + bestAgent.getLastUnemploymentRateMultiplier().findValue());
+        System.out.println("agent 2 weights: " + bestAgent2.getLastDowClosingMultiplier().findValue()
+                + ", " + bestAgent2.getLastDowClosingPercentMultiplier().findValue()
+                + ", " + bestAgent2.getLastUnemploymentRateMultiplier().findValue());
         assertEquals(bestAgent.getLastDowClosingMultiplier().findValue(),
-                bestAgent2.getLastDowClosingMultiplier().findValue(), 0.002);
+                bestAgent2.getLastDowClosingMultiplier().findValue(), 0.0002);
+        assertEquals(bestAgent.getLastDowClosingPercentMultiplier().findValue(),
+                bestAgent2.getLastDowClosingPercentMultiplier().findValue(), 0.0002);
+        assertEquals(bestAgent.getLastUnemploymentRateMultiplier().findValue(),
+                bestAgent2.getLastUnemploymentRateMultiplier().findValue(), 0.0002);
+
+    }
+
+    private Population createPopulation(int popSize) throws Exception {
+      return new Population("target\\classes\\DJI.csv", "target\\classes\\UNRATE.csv", popSize);
     }
 }

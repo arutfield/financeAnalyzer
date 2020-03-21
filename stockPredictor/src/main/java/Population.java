@@ -6,17 +6,18 @@ public class Population {
     LinkedList<Agent> agents = new LinkedList<>();
     final static Logger logger = Logger.getLogger(Population.class);
 
-    public Population(String dowJonesDataFile, int numberOfAgents) throws Exception {
+    public Population(String dowJonesDataFile, String unemploymentDataFile, int numberOfAgents) throws Exception {
         if (numberOfAgents < 1) {
             String message = "need at least one agent. " + numberOfAgents + " is unusable";
             logger.error(message);
             throw new Exception(message);
         }
-        InputData.loadDowJonesClosing(dowJonesDataFile);
+        InputData.loadDowJonesClosing(dowJonesDataFile, unemploymentDataFile);
         for (int i = 0; i < numberOfAgents; i++) {
             Weight weight1 = new Weight();
             Weight weight2 = new Weight();
-            Agent agent = new Agent(weight1, weight2);
+            Weight weight3 = new Weight();
+            Agent agent = new Agent(weight1, weight2, weight3);
             agents.add(agent);
             logger.trace("agent created with weights " + weight1.printWeightValue() + "," + weight2.printWeightValue());
         }
@@ -87,7 +88,10 @@ public class Population {
         }
         agents.clear();
         agents = orderedList;
-        logger.debug("best agent in reordering: " + agents.get(0).getLastDowClosingMultiplier().findValue());
+        logger.debug("best agent in reordering: " + agents.get(0).getLastDowClosingMultiplier().findValue() + ", "
+                + agents.get(0).getLastDowClosingPercentMultiplier().findValue() + ", "
+                + agents.get(0).getLastUnemploymentRateMultiplier().findValue() + ", with value: "
+                + agents.get(0).getFitnessValueDowPrediction());
     }
 
     public Agent[] getWorstAgents(int numberOfAgents) throws Exception {
@@ -112,15 +116,20 @@ public class Population {
 
     public void generateChildren(int numberOfChildren) throws Exception {
         Agent[] parents = findFittestPair();
-        double mutationProbability = 0.1;
-        //number of weight attributes is 6, so range should be [0,7)
+        double mutationProbability = 0.2;
+        //number of weight attributes is 6, so range should be [0,7]
         for (int i = 0; i < numberOfChildren; i++) {
-            int crossPoint = (int) Math.floor(Math.random() * 14);
+            int crossPoint = (int) Math.floor(Math.random() * 8);
             Weight newDowMultiplier = new Weight(parents[0].getLastDowClosingMultiplier(),
-                    parents[1].getLastDowClosingMultiplier(), Math.max(crossPoint - 7, 0), mutationProbability);
+                    parents[1].getLastDowClosingMultiplier(), crossPoint, mutationProbability);
+
+            int crossPoint2 = (int) Math.floor(Math.random() * 8);
             Weight newDowPercentMultiplier = new Weight(parents[0].getLastDowClosingPercentMultiplier(),
-                    parents[1].getLastDowClosingPercentMultiplier(), Math.max(crossPoint - 7, 0), mutationProbability);
-            Agent agent = new Agent(newDowMultiplier, newDowPercentMultiplier);
+                    parents[1].getLastDowClosingPercentMultiplier(), crossPoint2, mutationProbability);
+            int crossPoint3 = (int) Math.floor(Math.random() * 8);
+            Weight newUnemploymentRateMultiplier = new Weight(parents[0].getLastUnemploymentRateMultiplier(),
+                    parents[1].getLastUnemploymentRateMultiplier(), crossPoint3, mutationProbability);
+            Agent agent = new Agent(newDowMultiplier, newDowPercentMultiplier, newUnemploymentRateMultiplier);
             //replace worst agent that hasn't been replaced yet
             agents.set(agents.size() - i - 1, agent);
         }

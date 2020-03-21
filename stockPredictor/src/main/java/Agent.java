@@ -6,12 +6,14 @@ public class Agent {
 
     private Weight lastDowClosingMultiplier;
     private Weight lastDowClosingPercentMultiplier;
+    private Weight lastUnemploymentRateMultiplier;
     private double fitnessValueDowPrediction = 0;
     final static Logger logger = Logger.getLogger(Agent.class);
 
-    public Agent(Weight lastDowClosingMultiplier, Weight lastDowClosingPercentMultiplier) {
+    public Agent(Weight lastDowClosingMultiplier, Weight lastDowClosingPercentMultiplier, Weight lastUnemploymentRateMultiplier) {
         this.lastDowClosingMultiplier = lastDowClosingMultiplier;
         this.lastDowClosingPercentMultiplier = lastDowClosingPercentMultiplier;
+        this.lastUnemploymentRateMultiplier = lastUnemploymentRateMultiplier;
         this.fitnessValueDowPrediction = calculateFitnessPredictingDow();
         logger.trace("new agent created with last dow multiplier of " + lastDowClosingMultiplier.findValue()
                 + " and fitness value " + fitnessValueDowPrediction);
@@ -24,18 +26,24 @@ public class Agent {
         int i=-1;
         double prevData = 0;
         double prevPercentData = 0;
+        double prevUnemploymentRate = 0;
         for (DataSample dataSample : dowClosingData) {
             i++;
             if (i == 0)
             {
                 prevData = dataSample.dowJonesClosing;
-               // prevPercentData =
+                prevPercentData = 0.0;
+                prevUnemploymentRate = dataSample.unemploymentRate;
                 continue;
             }
             double estimate = lastDowClosingMultiplier.findValue() * prevData
-                    + lastDowClosingPercentMultiplier.findValue() * prevPercentData;
-            difference += Math.abs(estimate - dataSample.dowJonesClosing);
+                    + lastDowClosingPercentMultiplier.findValue() * prevPercentData
+                    + lastUnemploymentRateMultiplier.findValue() * prevUnemploymentRate;
+            double predictedDow = prevData * (1.0 + estimate);
+            difference += Math.abs(predictedDow - dataSample.dowJonesClosing);
             prevData = dataSample.dowJonesClosing;
+            prevPercentData = dataSample.dowJonesClosingPercent;
+            prevUnemploymentRate = dataSample.unemploymentRate;
         }
         fitnessValueDowPrediction = difference;
         return fitnessValueDowPrediction;
@@ -52,5 +60,10 @@ public class Agent {
     public Weight getLastDowClosingPercentMultiplier() {
         return lastDowClosingPercentMultiplier;
     }
+
+    public Weight getLastUnemploymentRateMultiplier() {
+        return lastUnemploymentRateMultiplier;
+    }
+
 
 }
