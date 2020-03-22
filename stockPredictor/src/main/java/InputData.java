@@ -7,16 +7,17 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
 
-import javax.xml.crypto.Data;
-
 class DataSample {
    double dowJonesClosing;
    double dowJonesClosingPercent;
    double unemploymentRate;
-    public DataSample(Double dowJonesClosing, double dowJonesClosingPercent, double unemploymentRate) {
+   double unemploymentRatePercentChange;
+    public DataSample(Double dowJonesClosing, double dowJonesClosingPercent, double unemploymentRate,
+                      double unemploymentRatePercentChange) {
         this.dowJonesClosing = dowJonesClosing;
         this.dowJonesClosingPercent = dowJonesClosingPercent;
         this.unemploymentRate = unemploymentRate;
+        this.unemploymentRatePercentChange = unemploymentRatePercentChange;
     }
 }
 
@@ -36,7 +37,7 @@ public class InputData {
     public InputData() {
     }
 
-    public static void loadDowJonesClosing(String filenameDowData, String unemploymentDataFileName) {
+    public static void loadFiles(String filenameDowData, String unemploymentDataFileName) {
         allDataByDateList.clear();
         BufferedReader br = null;
         BufferedReader brUE = null;
@@ -109,11 +110,14 @@ public class InputData {
             fillMapBasedOnPrevious(unemploymentMap, Collections.max(dowJonesClosingMap.keySet()));
             for (int i = 0; i < Collections.max(dowJonesClosingMap.keySet()); i++) {
                 if (i == 0){
-                    allDataByDateList.add(new DataSample(dowJonesClosingMap.get(i), 0.0, unemploymentMap.get(i) ));
+                    allDataByDateList.add(new DataSample(dowJonesClosingMap.get(i), 0.0,
+                            unemploymentMap.get(i), 0.0 ));
                 } else {
                     double previousDowValue = allDataByDateList.get(i - 1).dowJonesClosing;
+                    double previousUnemploymentRateValue = allDataByDateList.get(i - 1).unemploymentRate;
                     double dowJonesClosingPercentChange = (dowJonesClosingMap.get(i) - previousDowValue) / previousDowValue * 100.0;
-                    allDataByDateList.add(new DataSample(dowJonesClosingMap.get(i), dowJonesClosingPercentChange, unemploymentMap.get(i)));
+                    double unemploymentRatePercentChange = (unemploymentMap.get(i) - previousUnemploymentRateValue) / previousUnemploymentRateValue * 100.0;
+                    allDataByDateList.add(new DataSample(dowJonesClosingMap.get(i), dowJonesClosingPercentChange, unemploymentMap.get(i), unemploymentRatePercentChange));
                 }
             }
         } catch (FileNotFoundException ex) {
@@ -200,6 +204,8 @@ public class InputData {
                 sb.append(sample.dowJonesClosingPercent);
                 sb.append(',');
                 sb.append(sample.unemploymentRate);
+                sb.append(',');
+                sb.append(sample.unemploymentRatePercentChange);
                 sb.append('\n');
 
                 writer.write(sb.toString());

@@ -12,14 +12,17 @@ public class Population {
             logger.error(message);
             throw new Exception(message);
         }
-        InputData.loadDowJonesClosing(dowJonesDataFile, unemploymentDataFile);
+        InputData.loadFiles(dowJonesDataFile, unemploymentDataFile);
         for (int i = 0; i < numberOfAgents; i++) {
-            Weight weight1 = new Weight();
-            Weight weight2 = new Weight();
-            Weight weight3 = new Weight();
-            Agent agent = new Agent(weight1, weight2, weight3);
+            Weight weights[] = new Weight[4];
+            String weightMessage = "agent created with weights ";
+            for (int j=0; j<weights.length; j++) {
+                weights[j] = new Weight();
+                weightMessage += ", " + weights[j].findValue();
+            }
+            Agent agent = new Agent(weights);
             agents.add(agent);
-            logger.trace("agent created with weights " + weight1.printWeightValue() + "," + weight2.printWeightValue());
+            logger.trace(weightMessage);
         }
         orderAgentsByFitness();
     }
@@ -90,7 +93,8 @@ public class Population {
         agents = orderedList;
         logger.debug("best agent in reordering: " + agents.get(0).getLastDowClosingMultiplier().findValue() + ", "
                 + agents.get(0).getLastDowClosingPercentMultiplier().findValue() + ", "
-                + agents.get(0).getLastUnemploymentRateMultiplier().findValue() + ", with value: "
+                + agents.get(0).getLastUnemploymentRateMultiplier().findValue() + ", "
+                + agents.get(0).getLastUnemploymentRatePercentChangeMultiplier().findValue() + ", with value: "
                 + agents.get(0).getFitnessValueDowPrediction());
     }
 
@@ -119,17 +123,23 @@ public class Population {
         double mutationProbability = 0.2;
         //number of weight attributes is 6, so range should be [0,7]
         for (int i = 0; i < numberOfChildren; i++) {
-            int crossPoint = (int) Math.floor(Math.random() * 8);
-            Weight newDowMultiplier = new Weight(parents[0].getLastDowClosingMultiplier(),
-                    parents[1].getLastDowClosingMultiplier(), crossPoint, mutationProbability);
+            int[] crossPoints = new int[4];
+            for (int j =0; j<crossPoints.length; j++) {
+                crossPoints[j] = (int) Math.floor(Math.random() * 8);
+            }
 
-            int crossPoint2 = (int) Math.floor(Math.random() * 8);
-            Weight newDowPercentMultiplier = new Weight(parents[0].getLastDowClosingPercentMultiplier(),
-                    parents[1].getLastDowClosingPercentMultiplier(), crossPoint2, mutationProbability);
-            int crossPoint3 = (int) Math.floor(Math.random() * 8);
-            Weight newUnemploymentRateMultiplier = new Weight(parents[0].getLastUnemploymentRateMultiplier(),
-                    parents[1].getLastUnemploymentRateMultiplier(), crossPoint3, mutationProbability);
-            Agent agent = new Agent(newDowMultiplier, newDowPercentMultiplier, newUnemploymentRateMultiplier);
+            Weight newDowMultiplier = new Weight(parents[0].getLastDowClosingMultiplier(),
+                        parents[1].getLastDowClosingMultiplier(), crossPoints[0], mutationProbability);
+                Weight newDowPercentMultiplier = new Weight(parents[0].getLastDowClosingPercentMultiplier(),
+                        parents[1].getLastDowClosingPercentMultiplier(), crossPoints[1], mutationProbability);
+                Weight newUnemploymentRateMultiplier = new Weight(parents[0].getLastUnemploymentRateMultiplier(),
+                        parents[1].getLastUnemploymentRateMultiplier(), crossPoints[2], mutationProbability);
+            Weight newUnemploymentRatePercentChangeMultiplier = new Weight(parents[0].getLastUnemploymentRatePercentChangeMultiplier(),
+                    parents[1].getLastUnemploymentRatePercentChangeMultiplier(), crossPoints[3], mutationProbability);
+            Weight[] weights = {newDowMultiplier, newDowPercentMultiplier, newUnemploymentRateMultiplier,
+                    newUnemploymentRatePercentChangeMultiplier};
+
+            Agent agent = new Agent(weights);
             //replace worst agent that hasn't been replaced yet
             agents.set(agents.size() - i - 1, agent);
         }

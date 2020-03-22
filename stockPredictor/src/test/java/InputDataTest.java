@@ -11,7 +11,7 @@ public class InputDataTest {
     @Test
     public void failedToFindFile()
     {
-        InputData.loadDowJonesClosing("fakeFile.csv", "//target//classes//UNRATE.csv");
+        InputData.loadFiles("fakeFile.csv", "//target//classes//UNRATE.csv");
         assertEquals(InputData.getAllDataList().size(), 0);
     }
 
@@ -107,8 +107,25 @@ public class InputDataTest {
         assertEquals(3.6, InputData.getAllDataList().get(InputData.getAllDataList().size()-1).unemploymentRate, 1e-6);
 
     }
+
+    @Test
+    public void findUnemploymentRatePercentChangeDay3(){
+        setupInputTest();
+        assertEquals(-1.369863014, InputData.getAllDataList().get(3).unemploymentRatePercentChange, 1e-6);
+
+    }
+
+    @Test
+    public void findUnemploymentRatePercentChangeSecondDay(){
+        setupInputTest();
+        assertEquals(0, InputData.getAllDataList().get(2).unemploymentRatePercentChange, 1e-6);
+
+    }
+
+
+
     private void setupInputTest(){
-        InputData.loadDowJonesClosing("target\\classes\\DJI.csv", "target\\classes\\UNRATE.csv");
+        InputData.loadFiles("target\\classes\\DJI.csv", "target\\classes\\UNRATE.csv");
 
     }
 

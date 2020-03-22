@@ -119,7 +119,7 @@ public class PopulationTest {
     public void testGetGenerations() throws Exception {
         int popSize = 500;
         int numberOfGenerations = 50;
-        int numberOfNewChildren = 200;
+        int numberOfNewChildren = 250;
         Population population = createPopulation(popSize);
         Agent bestAgent = population.getBestOfGenerations(numberOfGenerations, numberOfNewChildren);
 
