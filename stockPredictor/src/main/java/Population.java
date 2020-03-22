@@ -6,6 +6,7 @@ public class Population {
     LinkedList<Agent> agents = new LinkedList<>();
     final static Logger logger = Logger.getLogger(Population.class);
 
+
     public Population(String dowJonesDataFile, String unemploymentDataFile, int numberOfAgents) throws Exception {
         if (numberOfAgents < 1) {
             String message = "need at least one agent. " + numberOfAgents + " is unusable";
@@ -27,6 +28,7 @@ public class Population {
         orderAgentsByFitness();
     }
 
+
     public Agent getBestOfGenerations(int numberOfGenerations, int numberOfChildren) throws Exception {
         if (numberOfGenerations < 1) {
             String message = "need at least one generation, have " + numberOfGenerations;
@@ -39,6 +41,28 @@ public class Population {
         return findBestAgent();
     }
 
+    /**
+     * runs genetic algorithm until fitness function reaches goal value
+     * @param goalValue value to reach
+     * @param numberOfChildren per generation
+     * @param maximumNumberOfGenerations maximum allowed generations before bailing out
+     * @return best agent at end
+     * @throws Exception error
+     */
+    public Agent getGoalFitnessFunction(double goalValue, int numberOfChildren, int maximumNumberOfGenerations) throws Exception {
+
+        for (int i=0; i<maximumNumberOfGenerations; i++) {
+
+            logger.debug("generation: " + i);
+            generateChildren(numberOfChildren);
+            if (findBestAgent().getFitnessValueDowPrediction() < goalValue) {
+                return findBestAgent();
+
+            }
+        }
+        logger.warn("unable to reach goal of cost " + goalValue + " in " + maximumNumberOfGenerations + ". Returning best");
+        return findBestAgent();
+    }
 
     /**
      * find the agent with the smallest fitness function
@@ -98,6 +122,12 @@ public class Population {
                 + agents.get(0).getFitnessValueDowPrediction());
     }
 
+    /**
+     * gets the worst X agents
+     * @param numberOfAgents number of agents to return
+     * @return list of the X worst agents from worst to best
+     * @throws Exception error
+     */
     public Agent[] getWorstAgents(int numberOfAgents) throws Exception {
         if (agents.size() < numberOfAgents) {
             String message = "less than " + numberOfAgents + " agents found. Only " + agents.size() + " agents";
@@ -117,7 +147,11 @@ public class Population {
     }
 
 
-
+    /**
+     * generates the children for the next generation
+     * @param numberOfChildren number of children to generate
+     * @throws Exception error
+     */
     public void generateChildren(int numberOfChildren) throws Exception {
         Agent[] parents = findFittestPair();
         double mutationProbability = 0.2;

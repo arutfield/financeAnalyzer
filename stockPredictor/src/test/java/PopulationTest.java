@@ -141,6 +141,22 @@ public class PopulationTest {
 
     }
 
+    @Test
+    public void testGoalAlgorithm() throws Exception {
+        Population population = createPopulation(500);
+        Agent bestAgent = population.getGoalFitnessFunction(100, 300, 300);
+        assertTrue(bestAgent.getFitnessValueDowPrediction() <= 100);
+    }
+
+
+    @Test
+    public void tightenGoalAlgorithm() throws Exception {
+        double goalValue = 48;
+        Population population = createPopulation(500);
+        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 100000);
+        assertTrue(bestAgent.getFitnessValueDowPrediction() <= goalValue);
+    }
+
     private Population createPopulation(int popSize) throws Exception {
       return new Population("target\\classes\\DJI.csv", "target\\classes\\UNRATE.csv", popSize);
     }

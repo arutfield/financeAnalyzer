@@ -151,47 +151,36 @@ public class WeightTest
         Agent agent = new Agent(new Weight[] {weight, getZeroWeight(), getZeroWeight(), getZeroWeight()});
 
 
-        Weight weight2 = getWeightNeg27Point3105();
-        assertEquals(-27.3105, weight2.findValue(), 1e-12);
-        Agent agent1 = new Agent(new Weight[] {weight2, getZeroWeight(), getZeroWeight(), getZeroWeight()});
+        Agent agent1 = getNeg27Point3105Agent();
         Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),0, 0);
 
-        assertEquals(weight2.isNegative(), childWeight.isNegative());
-        assertEquals(weight2.getDigit(0), childWeight.getDigit(0), 1e-6);
-        assertEquals(weight2.getDigit(1), childWeight.getDigit(1), 1e-6);
-        assertEquals(weight2.getDigit(2), childWeight.getDigit(2), 1e-6);
-        assertEquals(weight2.getDigit(3), childWeight.getDigit(3), 1e-6);
-        assertEquals(weight2.getDigit(4), childWeight.getDigit(4), 1e-6);
+        assertEquals(agent1.getLastDowClosingMultiplier().isNegative(), childWeight.isNegative());
+        assertEquals(agent1.getLastDowClosingMultiplier().getDigit(0), childWeight.getDigit(0), 1e-6);
+        assertEquals(agent1.getLastDowClosingMultiplier().getDigit(1), childWeight.getDigit(1), 1e-6);
+        assertEquals(agent1.getLastDowClosingMultiplier().getDigit(2), childWeight.getDigit(2), 1e-6);
+        assertEquals(agent1.getLastDowClosingMultiplier().getDigit(3), childWeight.getDigit(3), 1e-6);
+        assertEquals(agent1.getLastDowClosingMultiplier().getDigit(4), childWeight.getDigit(4), 1e-6);
     }
 
     @Test
     public void parentMerge1() throws Exception {
-        Weight weight = getWeight11Point4363();
-        assertEquals(11.4363, weight.findValue(), 1e-12);
-        Agent agent = new Agent(new Weight[]{weight, getZeroWeight(), getZeroWeight(), getZeroWeight()});
+        Agent agent = get11Point4363Agent();
 
-
-        Weight weight2 = getWeightNeg27Point3105();
-        assertEquals(-27.3105, weight2.findValue(), 1e-12);
-        Agent agent1 = new Agent(new Weight[]{weight2, getZeroWeight(), getZeroWeight(), getZeroWeight()});
+        Agent agent1 = getNeg27Point3105Agent();
         Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),1, 0);
 
-        assertEquals(weight.isNegative(), childWeight.isNegative());
-        assertEquals(weight2.getDigit(0), childWeight.getDigit(0), 1e-6);
-        assertEquals(weight2.getDigit(1), childWeight.getDigit(1), 1e-6);
-        assertEquals(weight2.getDigit(2), childWeight.getDigit(2), 1e-6);
-        assertEquals(weight2.getDigit(3), childWeight.getDigit(3), 1e-6);
-        assertEquals(weight2.getDigit(4), childWeight.getDigit(4), 1e-6);
+        assertEquals(agent.getLastDowClosingMultiplier().isNegative(), childWeight.isNegative());
+        assertEquals(agent1.getLastDowClosingMultiplier().getDigit(0), childWeight.getDigit(0), 1e-6);
+        assertEquals(agent1.getLastDowClosingMultiplier().getDigit(1), childWeight.getDigit(1), 1e-6);
+        assertEquals(agent1.getLastDowClosingMultiplier().getDigit(2), childWeight.getDigit(2), 1e-6);
+        assertEquals(agent1.getLastDowClosingMultiplier().getDigit(3), childWeight.getDigit(3), 1e-6);
+        assertEquals(agent1.getLastDowClosingMultiplier().getDigit(4), childWeight.getDigit(4), 1e-6);
     }
     @Test
     public void parentMerge2() throws Exception {
+        Agent agent = get11Point4363Agent();
 
-        assertEquals(11.4363, getWeight11Point4363().findValue(), 1e-12);
-        Agent agent = new Agent(new Weight[] {getWeight11Point4363(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
-
-
-        assertEquals(-27.3105, getWeightNeg27Point3105().findValue(), 1e-12);
-        Agent agent1 = new Agent(new Weight[] {getWeightNeg27Point3105(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
+        Agent agent1 = getNeg27Point3105Agent();
         Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),2, 0);
 
         assertEquals(getWeight11Point4363().isNegative(), childWeight.isNegative());
@@ -205,12 +194,8 @@ public class WeightTest
 
     @Test
     public void parentMerge3() throws Exception {
-        assertEquals(11.4363, getWeight11Point4363().findValue(), 1e-12);
-        Agent agent = new Agent(new Weight[] {getWeight11Point4363(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
-
-
-        assertEquals(-27.3105, getWeightNeg27Point3105().findValue(), 1e-12);
-        Agent agent1 = new Agent(new Weight[] {getWeightNeg27Point3105(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
+        Agent agent = get11Point4363Agent();
+        Agent agent1 = getNeg27Point3105Agent();
         Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),3, 0);
 
         assertEquals(getWeight11Point4363().isNegative(), childWeight.isNegative());
@@ -223,12 +208,9 @@ public class WeightTest
 
     @Test
     public void parentMerge4() throws Exception {
-        assertEquals(11.4363, getWeight11Point4363().findValue(), 1e-12);
-        Agent agent = new Agent(new Weight[] {getWeight11Point4363(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
+        Agent agent = get11Point4363Agent();
 
-
-        assertEquals(-27.3105, getWeightNeg27Point3105().findValue(), 1e-12);
-        Agent agent1 = new Agent(new Weight[] {getWeightNeg27Point3105(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
+        Agent agent1 = getNeg27Point3105Agent();
         Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),4, 0);
 
         assertEquals(getWeight11Point4363().isNegative(), childWeight.isNegative());
@@ -241,12 +223,8 @@ public class WeightTest
 
     @Test
     public void parentMerge5() throws Exception {
-        assertEquals(11.4363, getWeight11Point4363().findValue(), 1e-12);
-        Agent agent = new Agent(new Weight[] {getWeight11Point4363(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
-
-
-        assertEquals(-27.3105, getWeightNeg27Point3105().findValue(), 1e-12);
-        Agent agent1 = new Agent(new Weight[] {getWeightNeg27Point3105(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
+        Agent agent = get11Point4363Agent();
+        Agent agent1 = getNeg27Point3105Agent();
         Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),
                 5, 0);
 
@@ -260,12 +238,8 @@ public class WeightTest
 
     @Test
     public void parentMerge6() throws Exception {
-        assertEquals(11.4363, getWeight11Point4363().findValue(), 1e-12);
-        Agent agent = new Agent(new Weight[] {getWeight11Point4363(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
-
-
-        assertEquals(-27.3105, getWeightNeg27Point3105().findValue(), 1e-12);
-        Agent agent1 = new Agent(new Weight[] {getWeightNeg27Point3105(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
+        Agent agent = get11Point4363Agent();
+        Agent agent1 = getNeg27Point3105Agent();
         Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),6, 0);
 
         assertEquals(getWeight11Point4363().isNegative(), childWeight.isNegative());
@@ -278,12 +252,8 @@ public class WeightTest
 
     @Test
     public void parentMerge7() throws Exception {
-        assertEquals(11.4363, getWeight11Point4363().findValue(), 1e-12);
-        Agent agent = new Agent(new Weight[] {getWeight11Point4363(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
-
-
-        assertEquals(-27.3105, getWeightNeg27Point3105().findValue(), 1e-12);
-        Agent agent1 = new Agent(new Weight[] {getWeightNeg27Point3105(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
+        Agent agent = get11Point4363Agent();
+        Agent agent1 = getNeg27Point3105Agent();
         try {
             Weight childWeight = new Weight(agent.getLastDowClosingMultiplier(), agent1.getLastDowClosingMultiplier(),
                     8, 0);
@@ -323,4 +293,18 @@ public class WeightTest
         return  new Weight(true, tens2, ones2, tenths2, hundredths2, thousandths2, tenThousandths2);
 
     }
+
+    private Agent getNeg27Point3105Agent() throws Exception {
+        Weight weight = getWeightNeg27Point3105();
+        assertEquals(-27.3105, weight.findValue(), 1e-12);
+        return new Agent(new Weight[] {weight, getZeroWeight(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
+    }
+
+
+    private Agent get11Point4363Agent() throws Exception {
+        Weight weight = getWeight11Point4363();
+        assertEquals(11.4363, weight.findValue(), 1e-12);
+        return new Agent(new Weight[] {weight, getZeroWeight(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
+    }
+
 }
