@@ -8,7 +8,8 @@ public class AgentTest {
     public void findFitnessFunctionWeight0() throws Exception {
         setupInputTest();
 
-        Agent agent = new Agent(new Weight[]{getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight()});
+        Agent agent = new Agent(new Weight[]{getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(),
+                getEmptyWeight(), getEmptyWeight()});
         assertEquals(607821.785/InputData.getAllDataList().size(), agent.getFitnessValueDowPrediction(), 1);
 
     }
@@ -25,13 +26,13 @@ public class AgentTest {
         Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths, tenThousandths );
 
 
-        Agent agent = new Agent(new Weight[]{weight, getEmptyWeight(), getEmptyWeight(), getEmptyWeight()});
+        Agent agent = new Agent(new Weight[]{weight, getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight()});
         assertEquals(155739941.4, agent.getFitnessValueDowPrediction(), 1);
 
     }
 
     private void setupInputTest(){
-        InputData.loadFiles("target\\classes\\DJI.csv", "target\\classes\\UNRATE.csv");
+        InputData.loadFiles("target\\classes\\DJI.csv", "target\\classes\\UNRATE.csv", "target\\classes\\CIVPART.csv");
 
     }
 

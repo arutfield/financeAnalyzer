@@ -7,15 +7,16 @@ public class Population {
     final static Logger logger = Logger.getLogger(Population.class);
 
 
-    public Population(String dowJonesDataFile, String unemploymentDataFile, int numberOfAgents) throws Exception {
+    public Population(String dowJonesDataFile, String unemploymentDataFile, String laborRateFile,
+                      int numberOfAgents) throws Exception {
         if (numberOfAgents < 1) {
             String message = "need at least one agent. " + numberOfAgents + " is unusable";
             logger.error(message);
             throw new Exception(message);
         }
-        InputData.loadFiles(dowJonesDataFile, unemploymentDataFile);
+        InputData.loadFiles(dowJonesDataFile, unemploymentDataFile, laborRateFile);
         for (int i = 0; i < numberOfAgents; i++) {
-            Weight weights[] = new Weight[4];
+            Weight weights[] = new Weight[6];
             String weightMessage = "agent created with weights ";
             for (int j=0; j<weights.length; j++) {
                 weights[j] = new Weight();
@@ -118,7 +119,9 @@ public class Population {
         logger.debug("best agent in reordering: " + agents.get(0).getLastDowClosingMultiplier().findValue() + ", "
                 + agents.get(0).getLastDowClosingPercentMultiplier().findValue() + ", "
                 + agents.get(0).getLastUnemploymentRateMultiplier().findValue() + ", "
-                + agents.get(0).getLastUnemploymentRatePercentChangeMultiplier().findValue() + ", with value: "
+                + agents.get(0).getLastUnemploymentRatePercentChangeMultiplier().findValue() + ", "
+                + agents.get(0).getLastCivilianParticipationRateMultiplier().findValue() + ", "
+                + agents.get(0).getLastCivilianParticipationRateChangeMultiplier().findValue() + ", with value: "
                 + agents.get(0).getFitnessValueDowPrediction());
     }
 
@@ -157,7 +160,7 @@ public class Population {
         double mutationProbability = 0.2;
         //number of weight attributes is 6, so range should be [0,7]
         for (int i = 0; i < numberOfChildren; i++) {
-            int[] crossPoints = new int[4];
+            int[] crossPoints = new int[6];
             for (int j =0; j<crossPoints.length; j++) {
                 crossPoints[j] = (int) Math.floor(Math.random() * 8);
             }
@@ -170,8 +173,12 @@ public class Population {
                         parents[1].getLastUnemploymentRateMultiplier(), crossPoints[2], mutationProbability);
             Weight newUnemploymentRatePercentChangeMultiplier = new Weight(parents[0].getLastUnemploymentRatePercentChangeMultiplier(),
                     parents[1].getLastUnemploymentRatePercentChangeMultiplier(), crossPoints[3], mutationProbability);
+            Weight newCivilianRateMultiplier = new Weight(parents[0].getLastCivilianParticipationRateMultiplier(),
+                    parents[1].getLastCivilianParticipationRateMultiplier(), crossPoints[4], mutationProbability);
+            Weight newCivilianRatePercentChangeMultiplier = new Weight(parents[0].getLastCivilianParticipationRateMultiplier(),
+                    parents[1].getLastCivilianParticipationRateMultiplier(), crossPoints[5], mutationProbability);
             Weight[] weights = {newDowMultiplier, newDowPercentMultiplier, newUnemploymentRateMultiplier,
-                    newUnemploymentRatePercentChangeMultiplier};
+                    newUnemploymentRatePercentChangeMultiplier, newCivilianRateMultiplier, newCivilianRatePercentChangeMultiplier};
 
             Agent agent = new Agent(weights);
             //replace worst agent that hasn't been replaced yet

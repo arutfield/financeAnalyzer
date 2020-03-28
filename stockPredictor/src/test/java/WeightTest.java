@@ -148,7 +148,7 @@ public class WeightTest
 
         Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths, tenThousandths);
         assertEquals(11.4362, weight.findValue(), 1e-12);
-        Agent agent = new Agent(new Weight[] {weight, getZeroWeight(), getZeroWeight(), getZeroWeight()});
+        Agent agent = new Agent(new Weight[] {weight, getZeroWeight(), getZeroWeight(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
 
 
         Agent agent1 = getNeg27Point3105Agent();
@@ -297,14 +297,14 @@ public class WeightTest
     private Agent getNeg27Point3105Agent() throws Exception {
         Weight weight = getWeightNeg27Point3105();
         assertEquals(-27.3105, weight.findValue(), 1e-12);
-        return new Agent(new Weight[] {weight, getZeroWeight(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
+        return new Agent(new Weight[] {weight, getZeroWeight(), getZeroWeight(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
     }
 
 
     private Agent get11Point4363Agent() throws Exception {
         Weight weight = getWeight11Point4363();
         assertEquals(11.4363, weight.findValue(), 1e-12);
-        return new Agent(new Weight[] {weight, getZeroWeight(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
+        return new Agent(new Weight[] {weight, getZeroWeight(), getZeroWeight(), getZeroWeight(), getZeroWeight(), getZeroWeight()});
     }
 
 }

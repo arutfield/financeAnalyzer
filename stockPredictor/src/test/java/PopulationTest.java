@@ -118,8 +118,8 @@ public class PopulationTest {
     @Test
     public void testGetGenerations() throws Exception {
         int popSize = 500;
-        int numberOfGenerations = 50;
-        int numberOfNewChildren = 250;
+        int numberOfGenerations = 150;
+        int numberOfNewChildren = 300;
         Population population = createPopulation(popSize);
         Agent bestAgent = population.getBestOfGenerations(numberOfGenerations, numberOfNewChildren);
 
@@ -151,13 +151,14 @@ public class PopulationTest {
 
     @Test
     public void tightenGoalAlgorithm() throws Exception {
-        double goalValue = 48;
+        double goalValue = 40;
         Population population = createPopulation(500);
         Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 100000);
         assertTrue(bestAgent.getFitnessValueDowPrediction() <= goalValue);
     }
 
     private Population createPopulation(int popSize) throws Exception {
-      return new Population("target\\classes\\DJI.csv", "target\\classes\\UNRATE.csv", popSize);
+      return new Population("target\\classes\\DJI.csv", "target\\classes\\UNRATE.csv",
+              "target\\classes\\CIVPART.csv", popSize);
     }
 }
