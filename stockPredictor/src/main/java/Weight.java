@@ -6,15 +6,16 @@ public class Weight {
     private byte[] digits = new byte[NUM_DIGITS];
     private double value = Double.POSITIVE_INFINITY;//default as uncalculated
     final static Logger logger = Logger.getLogger(Weight.class);
-    private static final int NUM_DIGITS=6;
+    static final int NUM_DIGITS=7;
 
     enum digitEnum {
-        TENS(0),
-        ONES(1),
-        TENTHS(2),
-        HUNDREDTHS(3),
-        THOUSANDTHS(4),
-        TENTHOUSANDTHS(5);
+       // TENS(0),
+        ONES(0),
+        TENTHS(1),
+        HUNDREDTHS(2),
+        THOUSANDTHS(3),
+        TENTHOUSANDTHS(4),
+        HUNDREDTHOUSANDTHS(5);
 
         private final int value;
         private digitEnum(int value) {
@@ -79,13 +80,9 @@ public class Weight {
     }
 
 
-    public Weight(boolean isNegative, byte tens, byte ones, byte tenths, byte hundredths, byte thousandths, byte tenThousandths) {
+    public Weight(boolean isNegative, byte ones, byte tenths, byte hundredths, byte thousandths,
+                  byte tenThousandths, byte hundredThousandths) {
         this.isNegative = isNegative;
-        this.digits[digitEnum.TENS.value] = tens;
-        if (tens < 0 || tens > 9) {
-            logger.warn("desired tens of " + tens + " is out of range");
-            this.digits[digitEnum.TENS.value] = 0;
-        }
         this.digits[digitEnum.ONES.value] = ones;
         if (ones < 0 || ones > 9) {
             logger.warn("desired ones of " + ones + " is out of range");
@@ -111,12 +108,17 @@ public class Weight {
             logger.warn("desired ten thousandths of " + tenThousandths + " is out of range");
             this.digits[digitEnum.TENTHOUSANDTHS.value] = 0;
         }
+        this.digits[digitEnum.HUNDREDTHOUSANDTHS.value] = hundredThousandths;
+        if (tenThousandths < 0 || tenThousandths > 9) {
+            logger.warn("desired hundred thousandths of " + hundredThousandths + " is out of range");
+            this.digits[digitEnum.HUNDREDTHOUSANDTHS.value] = 0;
+        }
     }
 
     public double findValue() {
         if (value == Double.POSITIVE_INFINITY) {
             value = 0;
-            double multiplier = 10.0;
+            double multiplier = 1.0;
             for (int i=0; i<NUM_DIGITS; i++) {
                 value += digits[i] * multiplier;
                 multiplier /= 10.0;

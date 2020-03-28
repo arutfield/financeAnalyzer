@@ -8,15 +8,17 @@ import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
 
 class DataSample {
+    Date date;
    double dowJonesClosing;
    double dowJonesClosingPercent;
    double unemploymentRate;
    double unemploymentRatePercentChange;
    double civilianParticipationRate;
    double civilianParticipationRatePercentChange;
-    public DataSample(Double dowJonesClosing, double dowJonesClosingPercent, double unemploymentRate,
+    public DataSample(Date date, Double dowJonesClosing, double dowJonesClosingPercent, double unemploymentRate,
                       double unemploymentRatePercentChange, double civilianParticipationRate,
                       double civilianParticipationRatePercentChange) {
+        this.date = date;
         this.dowJonesClosing = dowJonesClosing;
         this.dowJonesClosingPercent = dowJonesClosingPercent;
         this.unemploymentRate = unemploymentRate;
@@ -143,8 +145,11 @@ public class InputData {
             fillMapBasedOnPrevious(unemploymentMap, Collections.max(dowJonesClosingMap.keySet()));
             fillMapBasedOnPrevious(civilianParticipationMap, Collections.max(dowJonesClosingMap.keySet()));
             for (int i = 0; i < Collections.max(dowJonesClosingMap.keySet()); i++) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(startDate);
+                cal.add(Calendar.DAY_OF_MONTH, i+1);
                 if (i == 0){
-                    allDataByDateList.add(new DataSample(dowJonesClosingMap.get(i), 0.0,
+                    allDataByDateList.add(new DataSample(cal.getTime(), dowJonesClosingMap.get(i), 0.0,
                             unemploymentMap.get(i), 0.0, civilianParticipationMap.get(i), 0.0 ));
                 } else {
                     double previousDowValue = allDataByDateList.get(i - 1).dowJonesClosing;
@@ -154,7 +159,7 @@ public class InputData {
                     double unemploymentRatePercentChange = (unemploymentMap.get(i) - previousUnemploymentRateValue) / previousUnemploymentRateValue * 100.0;
                     double civilianParticipationRateChange = (civilianParticipationMap.get(i) - previousCivilianParticipationRateValue)
                             / previousCivilianParticipationRateValue * 100.0;
-                    allDataByDateList.add(new DataSample(dowJonesClosingMap.get(i), dowJonesClosingPercentChange,
+                    allDataByDateList.add(new DataSample(cal.getTime(), dowJonesClosingMap.get(i), dowJonesClosingPercentChange,
                             unemploymentMap.get(i), unemploymentRatePercentChange, civilianParticipationMap.get(i),
                             civilianParticipationRateChange));
                 }
@@ -234,12 +239,12 @@ public class InputData {
         try (PrintWriter writer = new PrintWriter(new File("allData.csv"))) {
             int i=0;
             StringBuilder headSb = new StringBuilder();
-            headSb.append("map number, DJ close, DJ % change, Unemployment, Unemployment % change, civilian rate, civilian % change\n");
+            headSb.append("date, DJ close, DJ % change, Unemployment, Unemployment % change, civilian rate, civilian % change\n");
             writer.write(headSb.toString());
             for (DataSample sample : allDataByDateList) {
 
                 StringBuilder sb = new StringBuilder();
-                sb.append(i);
+                sb.append(sample.date.toString());
                 sb.append(',');
                 sb.append(sample.dowJonesClosing);
                 sb.append(',');

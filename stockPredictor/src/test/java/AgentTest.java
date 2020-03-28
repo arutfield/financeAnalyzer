@@ -9,7 +9,7 @@ public class AgentTest {
         setupInputTest();
 
         Agent agent = new Agent(new Weight[]{getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(),
-                getEmptyWeight(), getEmptyWeight()});
+                getEmptyWeight(), getEmptyWeight(), getEmptyWeight()});
         assertEquals(607821.785/InputData.getAllDataList().size(), agent.getFitnessValueDowPrediction(), 1);
 
     }
@@ -17,16 +17,16 @@ public class AgentTest {
     @Test
     public void findFitnessFunctionWeight1Point1() throws Exception {
         setupInputTest();
-        Byte tens = 0;
         Byte ones = 1;
         Byte tenths = 1;
         Byte hundredths = 0;
         Byte thousandths = 0;
         Byte tenThousandths = 0;
-        Weight weight = new Weight(false, tens, ones, tenths, hundredths, thousandths, tenThousandths );
+        Byte hundredThousandths = 0;
+        Weight weight = new Weight(false, ones, tenths, hundredths, thousandths, tenThousandths, hundredThousandths);
 
 
-        Agent agent = new Agent(new Weight[]{weight, getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight()});
+        Agent agent = new Agent(new Weight[]{weight, getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight()});
         assertEquals(155739941.4, agent.getFitnessValueDowPrediction(), 1);
 
     }

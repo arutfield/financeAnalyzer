@@ -15,8 +15,19 @@ public class Population {
             throw new Exception(message);
         }
         InputData.loadFiles(dowJonesDataFile, unemploymentDataFile, laborRateFile);
-        for (int i = 0; i < numberOfAgents; i++) {
-            Weight weights[] = new Weight[6];
+
+        //add zero weight agent
+        Weight zeroWeightArray[] = new Weight[Agent.WEIGHT_SIZE];
+        byte zeroByte = 0;
+        for (int j=0; j<zeroWeightArray.length; j++) {
+            zeroWeightArray[j] = new Weight(true, zeroByte, zeroByte,zeroByte, zeroByte, zeroByte, zeroByte);
+        }
+        agents.add(new Agent(zeroWeightArray));
+        if (numberOfAgents > 1) {
+            agents.add(new Agent(zeroWeightArray));
+        }
+        for (int i = 2; i < numberOfAgents; i++) {
+            Weight weights[] = new Weight[Agent.WEIGHT_SIZE];
             String weightMessage = "agent created with weights ";
             for (int j=0; j<weights.length; j++) {
                 weights[j] = new Weight();
@@ -121,7 +132,8 @@ public class Population {
                 + agents.get(0).getLastUnemploymentRateMultiplier().findValue() + ", "
                 + agents.get(0).getLastUnemploymentRatePercentChangeMultiplier().findValue() + ", "
                 + agents.get(0).getLastCivilianParticipationRateMultiplier().findValue() + ", "
-                + agents.get(0).getLastCivilianParticipationRateChangeMultiplier().findValue() + ", with value: "
+                + agents.get(0).getLastCivilianParticipationRateChangeMultiplier().findValue() + ", "
+                + agents.get(0).getOffset().findValue() + ", with value: "
                 + agents.get(0).getFitnessValueDowPrediction());
     }
 
@@ -157,12 +169,12 @@ public class Population {
      */
     public void generateChildren(int numberOfChildren) throws Exception {
         Agent[] parents = findFittestPair();
-        double mutationProbability = 0.2;
-        //number of weight attributes is 6, so range should be [0,7]
+        double mutationProbability = 0.1;
+        //number of weight attributes is 6, so range should be [0,8]
         for (int i = 0; i < numberOfChildren; i++) {
-            int[] crossPoints = new int[6];
+            int[] crossPoints = new int[Agent.WEIGHT_SIZE];
             for (int j =0; j<crossPoints.length; j++) {
-                crossPoints[j] = (int) Math.floor(Math.random() * 8);
+                crossPoints[j] = (int) Math.floor(Math.random() * (Weight.NUM_DIGITS + 1));
             }
 
             Weight newDowMultiplier = new Weight(parents[0].getLastDowClosingMultiplier(),
@@ -175,10 +187,12 @@ public class Population {
                     parents[1].getLastUnemploymentRatePercentChangeMultiplier(), crossPoints[3], mutationProbability);
             Weight newCivilianRateMultiplier = new Weight(parents[0].getLastCivilianParticipationRateMultiplier(),
                     parents[1].getLastCivilianParticipationRateMultiplier(), crossPoints[4], mutationProbability);
-            Weight newCivilianRatePercentChangeMultiplier = new Weight(parents[0].getLastCivilianParticipationRateMultiplier(),
-                    parents[1].getLastCivilianParticipationRateMultiplier(), crossPoints[5], mutationProbability);
+            Weight newCivilianRatePercentChangeMultiplier = new Weight(parents[0].getLastCivilianParticipationRateChangeMultiplier(),
+                    parents[1].getLastCivilianParticipationRateChangeMultiplier(), crossPoints[5], mutationProbability);
+            Weight newOffset = new Weight(parents[0].getOffset(),
+                    parents[1].getOffset(), crossPoints[6], mutationProbability);
             Weight[] weights = {newDowMultiplier, newDowPercentMultiplier, newUnemploymentRateMultiplier,
-                    newUnemploymentRatePercentChangeMultiplier, newCivilianRateMultiplier, newCivilianRatePercentChangeMultiplier};
+                    newUnemploymentRatePercentChangeMultiplier, newCivilianRateMultiplier, newCivilianRatePercentChangeMultiplier, newOffset};
 
             Agent agent = new Agent(weights);
             //replace worst agent that hasn't been replaced yet
