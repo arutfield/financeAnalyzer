@@ -8,19 +8,19 @@ public class Population {
 
 
     public Population(String dowJonesDataFile, String unemploymentDataFile, String laborRateFile,
-                      int numberOfAgents) throws Exception {
+                      String bankBorrowingFile, int numberOfAgents) throws Exception {
         if (numberOfAgents < 1) {
             String message = "need at least one agent. " + numberOfAgents + " is unusable";
             logger.error(message);
             throw new Exception(message);
         }
-        InputData.loadFiles(dowJonesDataFile, unemploymentDataFile, laborRateFile);
+        InputData.loadFiles(dowJonesDataFile, unemploymentDataFile, laborRateFile, bankBorrowingFile);
 
         //add zero weight agent
         Weight zeroWeightArray[] = new Weight[Agent.WEIGHT_SIZE];
         byte zeroByte = 0;
         for (int j=0; j<zeroWeightArray.length; j++) {
-            zeroWeightArray[j] = new Weight(true, zeroByte, zeroByte,zeroByte, zeroByte, zeroByte, zeroByte);
+            zeroWeightArray[j] = new Weight(true, zeroByte, zeroByte,zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte);
         }
         agents.add(new Agent(zeroWeightArray));
         if (numberOfAgents > 1) {
@@ -40,6 +40,14 @@ public class Population {
         orderAgentsByFitness();
     }
 
+    /**
+     * replaces agent at end of list and reorders
+     * @param agent to add
+     */
+    public void addAgent(Agent agent){
+        agents.add(agents.size()-1, agent);
+        orderAgentsByFitness();
+    }
 
     public Agent getBestOfGenerations(int numberOfGenerations, int numberOfChildren) throws Exception {
         if (numberOfGenerations < 1) {
@@ -133,6 +141,8 @@ public class Population {
                 + agents.get(0).getLastUnemploymentRatePercentChangeMultiplier().findValue() + ", "
                 + agents.get(0).getLastCivilianParticipationRateMultiplier().findValue() + ", "
                 + agents.get(0).getLastCivilianParticipationRateChangeMultiplier().findValue() + ", "
+                + agents.get(0).getBorrowedMoneyMultiplier().findValue() + ", "
+                + agents.get(0).getBorrowedMoneyRateChangeMultiplier().findValue() + ", "
                 + agents.get(0).getOffset().findValue() + ", with value: "
                 + agents.get(0).getFitnessValueDowPrediction());
     }
@@ -170,7 +180,7 @@ public class Population {
     public void generateChildren(int numberOfChildren) throws Exception {
         Agent[] parents = findFittestPair();
         double mutationProbability = 0.1;
-        //number of weight attributes is 6, so range should be [0,8]
+
         for (int i = 0; i < numberOfChildren; i++) {
             int[] crossPoints = new int[Agent.WEIGHT_SIZE];
             for (int j =0; j<crossPoints.length; j++) {
@@ -189,10 +199,16 @@ public class Population {
                     parents[1].getLastCivilianParticipationRateMultiplier(), crossPoints[4], mutationProbability);
             Weight newCivilianRatePercentChangeMultiplier = new Weight(parents[0].getLastCivilianParticipationRateChangeMultiplier(),
                     parents[1].getLastCivilianParticipationRateChangeMultiplier(), crossPoints[5], mutationProbability);
+            Weight newBorrowedMultiplier = new Weight(parents[0].getBorrowedMoneyMultiplier(),
+                    parents[1].getBorrowedMoneyMultiplier(), crossPoints[6], mutationProbability);
+            Weight newBorrowedPercentChangeMultiplier = new Weight(parents[0].getBorrowedMoneyRateChangeMultiplier(),
+                    parents[1].getBorrowedMoneyRateChangeMultiplier(), crossPoints[7], mutationProbability);
             Weight newOffset = new Weight(parents[0].getOffset(),
-                    parents[1].getOffset(), crossPoints[6], mutationProbability);
+                    parents[1].getOffset(), crossPoints[8], mutationProbability);
             Weight[] weights = {newDowMultiplier, newDowPercentMultiplier, newUnemploymentRateMultiplier,
-                    newUnemploymentRatePercentChangeMultiplier, newCivilianRateMultiplier, newCivilianRatePercentChangeMultiplier, newOffset};
+                    newUnemploymentRatePercentChangeMultiplier, newCivilianRateMultiplier,
+                    newCivilianRatePercentChangeMultiplier, newBorrowedMultiplier, newBorrowedPercentChangeMultiplier,
+                    newOffset};
 
             Agent agent = new Agent(weights);
             //replace worst agent that hasn't been replaced yet

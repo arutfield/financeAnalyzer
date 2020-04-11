@@ -12,7 +12,7 @@ public class InputDataTest {
     public void failedToFindFile()
     {
         InputData.loadFiles("fakeFile.csv", "//target//classes//UNRATE.csv",
-                "//target//classes//CIVPART.csv");
+                "//target//classes//CIVPART.csv", "target\\classes\\bankBorrowing.csv");
         assertEquals(InputData.getAllDataList().size(), 0);
     }
 
@@ -101,9 +101,6 @@ public class InputDataTest {
 
     }
 
-
-
-
     @Test
     public void dumpInfo() {
         setupInputTest();
@@ -166,7 +163,7 @@ public class InputDataTest {
     }
 
     private void setupInputTest(){
-        InputData.loadFiles("target\\classes\\DJI.csv", "target\\classes\\UNRATE.csv", "target\\classes\\CIVPART.csv");
+        InputData.loadFiles("target\\classes\\DJI.csv", "target\\classes\\UNRATE.csv", "target\\classes\\CIVPART.csv", "target\\classes\\bankBorrowing.csv");
 
     }
 

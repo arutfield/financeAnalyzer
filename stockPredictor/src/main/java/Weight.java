@@ -6,7 +6,7 @@ public class Weight {
     private byte[] digits = new byte[NUM_DIGITS];
     private double value = Double.POSITIVE_INFINITY;//default as uncalculated
     final static Logger logger = Logger.getLogger(Weight.class);
-    static final int NUM_DIGITS=7;
+    static final int NUM_DIGITS=digitEnum.values().length;
 
     enum digitEnum {
        // TENS(0),
@@ -15,7 +15,9 @@ public class Weight {
         HUNDREDTHS(2),
         THOUSANDTHS(3),
         TENTHOUSANDTHS(4),
-        HUNDREDTHOUSANDTHS(5);
+        HUNDREDTHOUSANDTHS(5),
+        MILLIONTHS(6),
+        TENMILLIONTHS(7);
 
         private final int value;
         private digitEnum(int value) {
@@ -81,7 +83,7 @@ public class Weight {
 
 
     public Weight(boolean isNegative, byte ones, byte tenths, byte hundredths, byte thousandths,
-                  byte tenThousandths, byte hundredThousandths) {
+                  byte tenThousandths, byte hundredThousandths, byte millionths, byte tenMillionths) {
         this.isNegative = isNegative;
         this.digits[digitEnum.ONES.value] = ones;
         if (ones < 0 || ones > 9) {
@@ -112,6 +114,16 @@ public class Weight {
         if (tenThousandths < 0 || tenThousandths > 9) {
             logger.warn("desired hundred thousandths of " + hundredThousandths + " is out of range");
             this.digits[digitEnum.HUNDREDTHOUSANDTHS.value] = 0;
+        }
+        this.digits[digitEnum.MILLIONTHS.value] = millionths;
+        if (millionths < 0 || millionths > 9) {
+            logger.warn("desired millionths of " + millionths + " is out of range");
+            this.digits[digitEnum.MILLIONTHS.value] = 0;
+        }
+        this.digits[digitEnum.TENMILLIONTHS.value] = tenMillionths;
+        if (tenMillionths < 0 || tenMillionths > 9) {
+            logger.warn("desired ten millionths of " + tenMillionths + " is out of range");
+            this.digits[digitEnum.TENMILLIONTHS.value] = 0;
         }
     }
 

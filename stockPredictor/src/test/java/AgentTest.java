@@ -9,35 +9,41 @@ public class AgentTest {
         setupInputTest();
 
         Agent agent = new Agent(new Weight[]{getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(),
-                getEmptyWeight(), getEmptyWeight(), getEmptyWeight()});
-        assertEquals(607821.785/InputData.getAllDataList().size(), agent.getFitnessValueDowPrediction(), 1);
+                getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight()});
+        assertEquals(0.498675, agent.getFitnessValueDowPrediction(), 1);
 
     }
 
     @Test
     public void findFitnessFunctionWeight1Point1() throws Exception {
         setupInputTest();
-        Byte ones = 1;
+        Byte ones = 0;
         Byte tenths = 1;
         Byte hundredths = 0;
         Byte thousandths = 0;
         Byte tenThousandths = 0;
         Byte hundredThousandths = 0;
-        Weight weight = new Weight(false, ones, tenths, hundredths, thousandths, tenThousandths, hundredThousandths);
+        Byte millionths = 0;
+        Byte tenMillionths = 0;
+        Weight weight = new Weight(false, ones, tenths, hundredths, thousandths, tenThousandths, hundredThousandths, millionths, tenMillionths);
 
 
-        Agent agent = new Agent(new Weight[]{weight, getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight()});
-        assertEquals(155739941.4, agent.getFitnessValueDowPrediction(), 1);
+        Agent agent = new Agent(new Weight[]{weight, getEmptyWeight(), getEmptyWeight(), getEmptyWeight(),
+                getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight()});
+        assertEquals(991.3215518, agent.getFitnessValueDowPrediction(), 1);
 
     }
 
     private void setupInputTest(){
-        InputData.loadFiles("target\\classes\\DJI.csv", "target\\classes\\UNRATE.csv", "target\\classes\\CIVPART.csv");
+        InputData.loadFiles("target\\classes\\DJI.csv",
+                "target\\classes\\UNRATE.csv",
+                "target\\classes\\CIVPART.csv",
+                "target\\classes\\bankBorrowing.csv");
 
     }
 
     private Weight getEmptyWeight() {
         Byte zeroValue = 0;
-        return new Weight(false, zeroValue, zeroValue, zeroValue, zeroValue, zeroValue, zeroValue );
+        return new Weight(false, zeroValue, zeroValue, zeroValue, zeroValue, zeroValue, zeroValue, zeroValue, zeroValue );
     }
 }
