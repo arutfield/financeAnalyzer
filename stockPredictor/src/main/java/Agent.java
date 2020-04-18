@@ -83,6 +83,7 @@ public class Agent {
             prevPercentData = dataSample.dowJonesClosingPercent;
             prevUnemploymentRate = dataSample.unemploymentRate;
             prevUnemploymentRatePercentChange = dataSample.unemploymentRatePercentChange;
+            prevCivilianRate = dataSample.civilianParticipationRate;
             prevCivilianRatePercentChange = dataSample.civilianParticipationRatePercentChange;
             prevBankBorrowed = dataSample.moneyBorrowed;
             prevBankBorrowedPercentChange = dataSample.moneyBorrowedPercentChange;
