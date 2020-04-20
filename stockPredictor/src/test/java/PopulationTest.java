@@ -116,28 +116,6 @@ public class PopulationTest {
     }
 
 
- /*   @Test
-    public void testGetGenerations() throws Exception {
-        int popSize = 500;
-        int numberOfGenerations = 1000;
-        int numberOfNewChildren = 300;
-        Population population = createPopulation(popSize);
-        Agent bestAgent = population.getBestOfGenerations(numberOfGenerations, numberOfNewChildren);
-
-        Population population2 = createPopulation(popSize);
-        Agent bestAgent2 = population2.getBestOfGenerations(numberOfGenerations, numberOfNewChildren);
-
-        System.out.println("agent 1 weights: " + bestAgent.getLastDowClosingMultiplier().findValue()
-                + ", " + bestAgent.getLastDowClosingPercentMultiplier().findValue()
-                + ", " + bestAgent.getLastUnemploymentRateMultiplier().findValue());
-        System.out.println("agent 2 weights: " + bestAgent2.getLastDowClosingMultiplier().findValue()
-                + ", " + bestAgent2.getLastDowClosingPercentMultiplier().findValue()
-                + ", " + bestAgent2.getLastUnemploymentRateMultiplier().findValue());
-        assertEquals(bestAgent.getFitnessValueDowPrediction(),
-                bestAgent2.getFitnessValueDowPrediction(), 0.0002);
-
-    }*/
-
     @Test
     public void testGoalAlgorithm() throws Exception {
         Population population = createPopulation(600);
@@ -179,9 +157,11 @@ public class PopulationTest {
             weights[i] = emptyWeight;
         }
         weights[0] = new Weight(false, zeroByte, zeroByte, zeroByte,  zeroByte,  zeroByte, zeroByte, (byte) 1, zeroByte);
-        population.addAgent(new Agent(weights));
+        Agent goodAgent = new Agent(weights);
+        population.addAgent(goodAgent);
         Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
         assertTrue(bestAgent.getFitnessValueDowPrediction() <= goalValue);
+        assertEquals(bestAgent, goodAgent);
     }
 
     @Test
@@ -197,9 +177,11 @@ public class PopulationTest {
             weights[i] = emptyWeight;
         }
         weights[1] = new Weight(false, (byte) 1, zeroByte, zeroByte, zeroByte,  zeroByte, zeroByte, zeroByte, zeroByte);
-        population.addAgent(new Agent(weights));
+        Agent goodAgent = new Agent(weights);
+        population.addAgent(goodAgent);
         Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
         assertTrue(bestAgent.getFitnessValueDowPrediction() <= goalValue);
+        assertEquals(bestAgent, goodAgent);
     }
 
     @Test
@@ -215,9 +197,11 @@ public class PopulationTest {
             weights[i] = emptyWeight;
         }
         weights[2] = new Weight(false, zeroByte, (byte) 1, zeroByte, zeroByte,  zeroByte,  zeroByte, zeroByte,  zeroByte);
-        population.addAgent(new Agent(weights));
+        Agent goodAgent = new Agent(weights);
+        population.addAgent(goodAgent);
         Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
         assertTrue(bestAgent.getFitnessValueDowPrediction() <= goalValue);
+        assertEquals(bestAgent, goodAgent);
     }
 
     @Test
@@ -233,9 +217,11 @@ public class PopulationTest {
             weights[i] = emptyWeight;
         }
         weights[3] = new Weight(false, (byte) 2,  zeroByte,zeroByte, zeroByte,  zeroByte,  zeroByte, zeroByte,  zeroByte);
-        population.addAgent(new Agent(weights));
+        Agent goodAgent = new Agent(weights);
+        population.addAgent(goodAgent);
         Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
         assertTrue(bestAgent.getFitnessValueDowPrediction() <= goalValue);
+        assertEquals(bestAgent, goodAgent);
     }
 
     @Test
@@ -249,10 +235,11 @@ public class PopulationTest {
             weightArray[i] = new Weight(false, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte,zeroByte, zeroByte, zeroByte);
         }
         weightArray[4] = new Weight(false, zeroByte, zeroByte, (byte) 1, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte);
-        population.addAgent(new Agent(weightArray));
+        Agent goodAgent = new Agent(weightArray);
+        population.addAgent(goodAgent);
         Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
         assertTrue(bestAgent.getFitnessValueDowPrediction() <= goalValue);
-
+        assertEquals(bestAgent, goodAgent);
     }
 
     @Test
@@ -266,9 +253,11 @@ public class PopulationTest {
             weightArray[i] = new Weight(false, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte,zeroByte, zeroByte, zeroByte);
         }
         weightArray[5] = new Weight(true, (byte) 5, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte);
-        population.addAgent(new Agent(weightArray));
+        Agent goodAgent = new Agent(weightArray);
+        population.addAgent(goodAgent);
         Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
         assertTrue(bestAgent.getFitnessValueDowPrediction() <= goalValue);
+        assertEquals(bestAgent, goodAgent);
 
     }
 
@@ -283,9 +272,11 @@ public class PopulationTest {
             weightArray[i] = new Weight(false, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte,zeroByte, zeroByte, zeroByte);
         }
         weightArray[6] = new Weight(false,  zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, (byte) 7, (byte) 1);
-        population.addAgent(new Agent(weightArray));
+        Agent goodAgent = new Agent(weightArray);
+        population.addAgent(goodAgent);
         Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
         assertTrue(bestAgent.getFitnessValueDowPrediction() <= goalValue);
+        assertEquals(bestAgent, goodAgent);
     }
 
     @Test
@@ -299,10 +290,53 @@ public class PopulationTest {
             weightArray[i] = new Weight(false, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte,zeroByte, zeroByte, zeroByte);
         }
         weightArray[7] = new Weight(true,  zeroByte, zeroByte, (byte) 3, (byte) 2, zeroByte, zeroByte, zeroByte, zeroByte);
-        population.addAgent(new Agent(weightArray));
+        Agent goodAgent = new Agent(weightArray);
+        population.addAgent(goodAgent);
         Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
         assertTrue(bestAgent.getFitnessValueDowPrediction() <= goalValue);
+        assertEquals(bestAgent, goodAgent);
     }
+
+
+    @Test
+    public void tightenGoalAlgorithmMoneyBorrowedChangeAndDow() throws Exception {
+        double goalValue = 2e-4;
+        Population population = new Population("target\\classes\\BorrowedMoneyNegThreePointTwoDowMinus51.csv", "target\\classes\\UNRATE.csv",
+                "target\\classes\\CIVPART.csv", "target\\classes\\bankBorrowing.csv", 500);
+        Byte zeroByte = 0;
+        Weight[] weightArray = new Weight[Agent.WEIGHT_SIZE];
+        for (int i=0; i<weightArray.length; i++) {
+            weightArray[i] = new Weight(false, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte,zeroByte, zeroByte, zeroByte);
+        }
+        weightArray[0] = new Weight(true, zeroByte, zeroByte, (byte) 5, (byte) 1,  zeroByte, zeroByte, zeroByte, zeroByte);
+        weightArray[7] = new Weight(true,  zeroByte, zeroByte, (byte) 3, (byte) 2, zeroByte, zeroByte, zeroByte, zeroByte);
+        Agent goodAgent = new Agent(weightArray);
+        population.addAgent(goodAgent);
+        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
+        assertTrue(bestAgent.getFitnessValueDowPrediction() <= goalValue);
+        assertEquals(bestAgent, goodAgent);
+    }
+
+    @Test
+    public void tightenGoalAlgorithmDow0Point001PercentOffset() throws Exception {
+        double goalValue = 6e-5;
+        Population population = new Population("target\\classes\\Dow0Point001.csv", "target\\classes\\UNRATE.csv",
+                "target\\classes\\CIVPART.csv", "target\\classes\\bankBorrowing.csv", 500);
+        InputData.printFullDowJonesClosing();
+        Byte zeroByte = 0;
+        Weight emptyWeight = new Weight(false, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte);
+        Weight[] weights = new Weight[Agent.WEIGHT_SIZE];
+        for (int i=0; i<weights.length; i++) {
+            weights[i] = emptyWeight;
+        }
+        weights[8] = new Weight(false, zeroByte, (byte) 1,  zeroByte, zeroByte,  zeroByte, zeroByte, zeroByte, zeroByte);
+        Agent goodAgent = new Agent(weights);
+        population.addAgent(goodAgent);
+        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
+        assertTrue(bestAgent.getFitnessValueDowPrediction() <= goalValue);
+        assertEquals(bestAgent, goodAgent);
+    }
+
 
     private Population createPopulation(int popSize) throws Exception {
       return new Population("target\\classes\\DJI.csv", "target\\classes\\UNRATE.csv",

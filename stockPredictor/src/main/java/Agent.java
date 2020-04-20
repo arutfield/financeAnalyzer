@@ -4,16 +4,26 @@ import java.util.LinkedList;
 
 
 public class Agent {
-    static final int WEIGHT_SIZE = 9;
-    private Weight lastDowClosingMultiplier;
-    private Weight lastDowClosingPercentMultiplier;
-    private Weight lastUnemploymentRateMultiplier;
-    private Weight lastUnemploymentRatePercentChangeMultiplier;
-    private Weight lastCivilianParticipationRateMultiplier;
-    private Weight lastCivilianParticipationRateChangeMultiplier;
-    private Weight borrowedMoneyMultiplier;
-    private Weight borrowedMoneyRateChangeMultiplier;
-    private Weight offset;
+    public enum WeightNameEnum {
+        DOWCLOSING(0),
+        DOWCLOSINGPERCENTCHANGE(1),
+        UNEMPLOYMENTRATE(2),
+        UNEMPLOYMENTRATECHANGE(3),
+        LABORRATE(4),
+        LABORRATEPERCENTCHANGE(5),
+        BORROWEDMONEY(6),
+        BORROWEDMONEYPERCENTCHANGE(7),
+        OFFSET(8);
+
+        private final int value;
+        private WeightNameEnum(int value) {
+            this.value = value;
+        }
+    }
+
+    static final int WEIGHT_SIZE = WeightNameEnum.values().length;
+
+    private Weight[] weights = new Weight[WEIGHT_SIZE];
     private double fitnessValueDowPrediction = 0;
     private double standardDeviation = Double.POSITIVE_INFINITY;
     final static Logger logger = Logger.getLogger(Agent.class);
@@ -24,18 +34,11 @@ public class Agent {
             logger.error(message);
             throw new Exception(message);
         }
-        this.lastDowClosingMultiplier = weights[0];
-        this.lastDowClosingPercentMultiplier = weights[1];
-        this.lastUnemploymentRateMultiplier = weights[2];
-        this.lastUnemploymentRatePercentChangeMultiplier = weights[3];
-        this.lastCivilianParticipationRateMultiplier = weights[4];
-        this.lastCivilianParticipationRateChangeMultiplier = weights[5];
-        this.borrowedMoneyMultiplier = weights[6];
-        this.borrowedMoneyRateChangeMultiplier = weights[7];
-        this.offset = weights[8];
+        for (int i=0; i<WEIGHT_SIZE; i++) {
+            this.weights[i] = weights[i];
+        }
         this.fitnessValueDowPrediction = calculateFitnessPredictingDow();
-        logger.trace("new agent created with last dow multiplier of " + lastDowClosingMultiplier.findValue()
-                + " and fitness value " + fitnessValueDowPrediction);
+        logger.trace("new agent created with fitness value " + fitnessValueDowPrediction);
     }
 
     private double calculateFitnessPredictingDow() {
@@ -43,50 +46,42 @@ public class Agent {
 
         double totalDifference = 0;
         int i=-1;
-        double prevData = 0;
-        double prevPercentData = 0;
-        double prevUnemploymentRate = 0;
-        double prevCivilianRate = 0;
-        double prevBankBorrowed = 0;
-        double prevUnemploymentRatePercentChange = 0;
-        double prevCivilianRatePercentChange = 0;
-        double prevBankBorrowedPercentChange = 0;
+        double[] prevData = new double[WEIGHT_SIZE-1];
+        for (int j=0; j<WEIGHT_SIZE-1; j++) {
+            prevData[j] = 0;
+        }
         double[] differences = new double[allData.size()];
         for (DataSample dataSample : allData) {
             i++;
             if (i == 0)
             {
-                prevData = dataSample.dowJonesClosing;
-                prevPercentData = 0.0;
-                prevUnemploymentRate = dataSample.unemploymentRate;
-                prevUnemploymentRatePercentChange = 0.0;
-                prevCivilianRate = dataSample.civilianParticipationRate;
-                prevCivilianRatePercentChange = 0.0;
-                prevBankBorrowed = dataSample.moneyBorrowed;
-                prevBankBorrowedPercentChange = 0.0;
+                prevData[WeightNameEnum.DOWCLOSING.value] = dataSample.dowJonesClosing;
+                prevData[WeightNameEnum.DOWCLOSINGPERCENTCHANGE.value] = 0.0;
+                prevData[WeightNameEnum.UNEMPLOYMENTRATE.value] = dataSample.unemploymentRate;
+                prevData[WeightNameEnum.UNEMPLOYMENTRATECHANGE.value] = 0.0;
+                prevData[WeightNameEnum.LABORRATE.value] = dataSample.civilianParticipationRate;
+                prevData[WeightNameEnum.LABORRATEPERCENTCHANGE.value] = 0.0;
+                prevData[WeightNameEnum.BORROWEDMONEY.value] = dataSample.moneyBorrowed;
+                prevData[WeightNameEnum.BORROWEDMONEYPERCENTCHANGE.value] = 0.0;
                 continue;
             }
-            double estimatedPercentIncrease = lastDowClosingMultiplier.findValue() * prevData
-                    + lastDowClosingPercentMultiplier.findValue() * prevPercentData
-                    + lastUnemploymentRateMultiplier.findValue() * prevUnemploymentRate
-                    + lastUnemploymentRatePercentChangeMultiplier.findValue() * prevUnemploymentRatePercentChange
-                    + lastCivilianParticipationRateMultiplier.findValue() * prevCivilianRate
-                    + lastCivilianParticipationRateChangeMultiplier.findValue() * prevCivilianRatePercentChange
-                    + borrowedMoneyMultiplier.findValue() * prevBankBorrowed
-                    + borrowedMoneyRateChangeMultiplier.findValue() * prevBankBorrowedPercentChange
-                    + offset.findValue();
-            double actualDowPercentIncrease = (dataSample.dowJonesClosing - prevData) / prevData * 100.0;
+
+            double estimatedPercentIncrease = getOffset().findValue();
+            for (int j=0; j<WEIGHT_SIZE-1; j++) {
+                estimatedPercentIncrease += weights[j].findValue() * prevData[j];
+            }
+            double actualDowPercentIncrease = (dataSample.dowJonesClosing - prevData[WeightNameEnum.DOWCLOSING.value]) / prevData[WeightNameEnum.DOWCLOSING.value] * 100.0;
             double error = Math.abs(estimatedPercentIncrease - actualDowPercentIncrease);
             totalDifference += error;
             differences[i] = error;
-            prevData = dataSample.dowJonesClosing;
-            prevPercentData = dataSample.dowJonesClosingPercent;
-            prevUnemploymentRate = dataSample.unemploymentRate;
-            prevUnemploymentRatePercentChange = dataSample.unemploymentRatePercentChange;
-            prevCivilianRate = dataSample.civilianParticipationRate;
-            prevCivilianRatePercentChange = dataSample.civilianParticipationRatePercentChange;
-            prevBankBorrowed = dataSample.moneyBorrowed;
-            prevBankBorrowedPercentChange = dataSample.moneyBorrowedPercentChange;
+            prevData[WeightNameEnum.DOWCLOSING.value] = dataSample.dowJonesClosing;
+            prevData[WeightNameEnum.DOWCLOSINGPERCENTCHANGE.value] = dataSample.dowJonesClosingPercent;
+            prevData[WeightNameEnum.UNEMPLOYMENTRATE.value] = dataSample.unemploymentRate;
+            prevData[WeightNameEnum.UNEMPLOYMENTRATECHANGE.value] = dataSample.unemploymentRatePercentChange;
+            prevData[WeightNameEnum.LABORRATE.value] = dataSample.civilianParticipationRate;
+            prevData[WeightNameEnum.LABORRATEPERCENTCHANGE.value] = dataSample.civilianParticipationRatePercentChange;
+            prevData[WeightNameEnum.BORROWEDMONEY.value] = dataSample.moneyBorrowed;
+            prevData[WeightNameEnum.BORROWEDMONEYPERCENTCHANGE.value] = dataSample.moneyBorrowedPercentChange;
         }
         fitnessValueDowPrediction = totalDifference / ((double) allData.size());
         if (fitnessValueDowPrediction == Double.POSITIVE_INFINITY) {
@@ -110,40 +105,40 @@ public class Agent {
     }
 
     public Weight getLastDowClosingMultiplier() {
-        return lastDowClosingMultiplier;
+        return weights[WeightNameEnum.DOWCLOSING.value];
     }
 
     public Weight getLastDowClosingPercentMultiplier() {
-        return lastDowClosingPercentMultiplier;
+        return weights[WeightNameEnum.DOWCLOSINGPERCENTCHANGE.value];
     }
 
     public Weight getLastUnemploymentRateMultiplier() {
-        return lastUnemploymentRateMultiplier;
+        return weights[WeightNameEnum.UNEMPLOYMENTRATE.value];
     }
 
     public Weight getLastUnemploymentRatePercentChangeMultiplier() {
-        return lastUnemploymentRatePercentChangeMultiplier;
+        return weights[WeightNameEnum.UNEMPLOYMENTRATECHANGE.value];
     }
 
     public Weight getLastCivilianParticipationRateMultiplier() {
-        return lastCivilianParticipationRateMultiplier;
+        return weights[WeightNameEnum.LABORRATE.value];
     }
 
     public Weight getLastCivilianParticipationRateChangeMultiplier() {
-        return lastCivilianParticipationRateChangeMultiplier;
+        return weights[WeightNameEnum.LABORRATEPERCENTCHANGE.value];
     }
 
     public Weight getBorrowedMoneyMultiplier() {
-        return borrowedMoneyMultiplier;
+        return weights[WeightNameEnum.BORROWEDMONEY.value];
     }
 
     public Weight getBorrowedMoneyRateChangeMultiplier() {
-        return borrowedMoneyRateChangeMultiplier;
+        return weights[WeightNameEnum.BORROWEDMONEYPERCENTCHANGE.value];
     }
 
 
     public Weight getOffset() {
-        return offset;
+        return weights[WeightNameEnum.OFFSET.value];
     }
 
     public double getStandardDeviation() {
