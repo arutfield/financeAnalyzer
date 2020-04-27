@@ -7,14 +7,14 @@ public class Population {
     final static Logger logger = Logger.getLogger(Population.class);
 
 
-    public Population(String dowJonesDataFile, String unemploymentDataFile, String laborRateFile,
+    public Population(String currentStockFile, String dowJonesDataFile, String unemploymentDataFile, String laborRateFile,
                       String bankBorrowingFile, int numberOfAgents) throws Exception {
         if (numberOfAgents < 1) {
             String message = "need at least one agent. " + numberOfAgents + " is unusable";
             logger.error(message);
             throw new Exception(message);
         }
-        InputData.loadFiles(dowJonesDataFile, unemploymentDataFile, laborRateFile, bankBorrowingFile);
+        InputData.loadFiles(currentStockFile, dowJonesDataFile, unemploymentDataFile, laborRateFile, bankBorrowingFile);
 
         //add zero weight agent
         Weight zeroWeightArray[] = new Weight[Agent.WEIGHT_SIZE];
@@ -75,7 +75,7 @@ public class Population {
 
             logger.debug("generation: " + i);
             generateChildren(numberOfChildren);
-            if (findBestAgent().getFitnessValueDowPrediction() < goalValue) {
+            if (findBestAgent().getFitnessValue() < goalValue) {
                 return findBestAgent();
 
             }
@@ -122,7 +122,7 @@ public class Population {
             int position = 0;
             boolean foundSpot = false;
             for (Agent orderedAgent : orderedList) {
-                if (agent.getFitnessValueDowPrediction() < orderedAgent.getFitnessValueDowPrediction()) {
+                if (agent.getFitnessValue() < orderedAgent.getFitnessValue()) {
                     orderedList.add(position, agent);
                     foundSpot = true;
                     break;
@@ -135,16 +135,11 @@ public class Population {
         }
         agents.clear();
         agents = orderedList;
-        logger.debug("best agent in reordering: " + agents.get(0).getLastDowClosingMultiplier().findValue() + ", "
-                + agents.get(0).getLastDowClosingPercentMultiplier().findValue() + ", "
-                + agents.get(0).getLastUnemploymentRateMultiplier().findValue() + ", "
-                + agents.get(0).getLastUnemploymentRatePercentChangeMultiplier().findValue() + ", "
-                + agents.get(0).getLastCivilianParticipationRateMultiplier().findValue() + ", "
-                + agents.get(0).getLastCivilianParticipationRateChangeMultiplier().findValue() + ", "
-                + agents.get(0).getBorrowedMoneyMultiplier().findValue() + ", "
-                + agents.get(0).getBorrowedMoneyRateChangeMultiplier().findValue() + ", "
-                + agents.get(0).getOffset().findValue() + ", with value: "
-                + agents.get(0).getFitnessValueDowPrediction());
+        StringBuilder message = new StringBuilder("best agent in reordering: ");
+        for (Agent.WeightNameEnum weightName : Agent.WeightNameEnum.values()){
+            message.append(agents.get(0).getWeight(weightName).findValue() +", ");
+        }
+        logger.debug(message + ", with value: " + agents.get(0).getFitnessValue());
     }
 
     /**
@@ -187,7 +182,14 @@ public class Population {
                 crossPoints[j] = (int) Math.floor(Math.random() * (Weight.NUM_DIGITS + 1));
             }
 
-            Weight newDowMultiplier = new Weight(parents[0].getLastDowClosingMultiplier(),
+            Weight[] weights = new Weight[Agent.WeightNameEnum.values().length];
+            int j=0;
+            for (Agent.WeightNameEnum weightNameEnum : Agent.WeightNameEnum.values()) {
+                weights[j] = new Weight(parents[0].getWeight(weightNameEnum), parents[1].getWeight(weightNameEnum),
+                        crossPoints[j], mutationProbability);
+                j++;
+            }
+        /*    Weight newDowMultiplier = new Weight(parents[0].getWeight(Agent.WeightNameEnum.DOWCLOSING),
                         parents[1].getLastDowClosingMultiplier(), crossPoints[0], mutationProbability);
                 Weight newDowPercentMultiplier = new Weight(parents[0].getLastDowClosingPercentMultiplier(),
                         parents[1].getLastDowClosingPercentMultiplier(), crossPoints[1], mutationProbability);
@@ -208,7 +210,7 @@ public class Population {
             Weight[] weights = {newDowMultiplier, newDowPercentMultiplier, newUnemploymentRateMultiplier,
                     newUnemploymentRatePercentChangeMultiplier, newCivilianRateMultiplier,
                     newCivilianRatePercentChangeMultiplier, newBorrowedMultiplier, newBorrowedPercentChangeMultiplier,
-                    newOffset};
+                    newOffset};*/
 
             Agent agent = new Agent(weights);
             //replace worst agent that hasn't been replaced yet

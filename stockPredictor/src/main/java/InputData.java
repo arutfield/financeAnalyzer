@@ -9,6 +9,8 @@ import org.apache.poi.ss.usermodel.*;
 
 class DataSample {
     Date date;
+   double currentStockClosing;
+   double currentStockClosingPercent;
    double dowJonesClosing;
    double dowJonesClosingPercent;
    double unemploymentRate;
@@ -17,11 +19,14 @@ class DataSample {
    double civilianParticipationRatePercentChange;
    double moneyBorrowed;
    double moneyBorrowedPercentChange;
-    public DataSample(Date date, Double dowJonesClosing, double dowJonesClosingPercent, double unemploymentRate,
+    public DataSample(Date date, double currentStockClosing, double currentStockClosingPercent, Double dowJonesClosing,
+                      double dowJonesClosingPercent, double unemploymentRate,
                       double unemploymentRatePercentChange, double civilianParticipationRate,
                       double civilianParticipationRatePercentChange, double moneyBorrowed,
                       double moneyBorrowedPercentChange) {
         this.date = date;
+        this.currentStockClosing = currentStockClosing;
+        this.currentStockClosingPercent = currentStockClosingPercent;
         this.dowJonesClosing = dowJonesClosing;
         this.dowJonesClosingPercent = dowJonesClosingPercent;
         this.unemploymentRate = unemploymentRate;
@@ -49,9 +54,11 @@ public class InputData {
     public InputData() {
     }
 
-    public static void loadFiles(String filenameDowData, String unemploymentDataFileName,
-                                 String civilianParticipationRateFileName, String bankBorrowedFileName) {
+    public static void loadFiles(String currentStockFile, String filenameDowData, String unemploymentDataFileName,
+                                 String civilianParticipationRateFileName, String bankBorrowedFileName) throws Exception {
         allDataByDateList.clear();
+        startDate = null;
+        BufferedReader brCs = null;
         BufferedReader br = null;
         BufferedReader brUE = null;
         BufferedReader brCv = null;
@@ -61,9 +68,55 @@ public class InputData {
 
         try {
 
+            //read in current stock to analyze data
+            brCs = new BufferedReader(new FileReader(currentStockFile));
+            int dateDifference = -1;
+            Map<Integer, Double> currentStockClosingMap = new HashMap<Integer, Double>();
+            while ((line = brCs.readLine()) != null) {
+
+                // use comma as separator
+                String[] data = line.split(cvsSplitBy);
+                if (data.length < 1){
+                    logger.warn("found line that could not be processed");
+                    continue;
+                }
+                String dateOfStock = data[0];
+
+                int prevDateDifference = dateDifference;
+
+                Date date1;
+                try {
+                    date1 = new SimpleDateFormat("yyyy-MM-dd").parse(dateOfStock);
+                } catch (ParseException ex) {
+                    try {
+                        date1 = new SimpleDateFormat("MM/dd/yyyy").parse(dateOfStock);
+                    } catch (ParseException ex1) {
+                        continue;
+                    }
+
+                }
+                if (startDate == null) {
+                    startDate = new Date(date1.getTime() - DateUtil.DAY_MILLISECONDS / 12);
+                    logger.debug("start date of dow - " + startDate.toString());
+
+                }
+                dateDifference = (int) ((date1.getTime() - startDate.getTime()) / (1000.0 * 60 * 60 * 24));
+                currentStockClosingMap.put(dateDifference, Double.valueOf(data[4]));
+                logger.trace("added day " + dateDifference + " for " + date1.toString() + ", "
+                        + currentStockClosingMap.get(dateDifference)
+                        + " to map");
+                int dateRateOfChange = dateDifference - prevDateDifference;
+                if ((dateRateOfChange > 4) || (dateRateOfChange == 2) || dateRateOfChange < 1) {
+                    logger.warn("unusual date difference gap of " + dateRateOfChange);
+                }
+
+
+            }
+
+
             //read in dow data
             br = new BufferedReader(new FileReader(filenameDowData));
-            int dateDifference = -1;
+            dateDifference = -1;
             Map<Integer, Double> dowJonesClosingMap = new HashMap<Integer, Double>();
             while ((line = br.readLine()) != null) {
 
@@ -122,7 +175,7 @@ public class InputData {
                     logger.trace("added unemployment " + dateDifference + " for " + date1.toString() + ", "
                             + unemploymentMap.get(dateDifference)
                             + " to map");
-                    int dateRateOfChange = dateDifference - prevDateDifference;
+                   // int dateRateOfChange = dateDifference - prevDateDifference;
                 } catch (ParseException ex) {
                     continue;
                 }
@@ -147,7 +200,7 @@ public class InputData {
                     logger.trace("added civilian participation " + dateDifference + " for " + date1.toString() + ", "
                             + civilianParticipationMap.get(dateDifference)
                             + " to map");
-                    int dateRateOfChange = dateDifference - prevDateDifference;
+                    //int dateRateOfChange = dateDifference - prevDateDifference;
                 } catch (ParseException ex) {
                     continue;
                 }
@@ -163,7 +216,7 @@ public class InputData {
                 String[] data = line.split(cvsSplitBy);
                 String dateOfUnemployment = data[0];
                 try {
-                    int prevDateDifference = dateDifference;
+                    //int prevDateDifference = dateDifference;
                     Date date1 = new SimpleDateFormat("MM/dd/yyyy").parse(dateOfUnemployment);
 
                     dateDifference = (int) ((date1.getTime() - startDate.getTime()) / (1000.0 * 60 * 60 * 24));
@@ -171,49 +224,64 @@ public class InputData {
                     logger.trace("added bank borrowing " + dateDifference + " for " + date1.toString() + ", "
                             + bankBorrowingMap.get(dateDifference)
                             + " to map");
-                    int dateRateOfChange = dateDifference - prevDateDifference;
+                    //int dateRateOfChange = dateDifference - prevDateDifference;
                 } catch (ParseException ex) {
                     continue;
                 }
             }
 
 
-
+            linearizeGaps(currentStockClosingMap);
             linearizeGaps(dowJonesClosingMap);
-            fillMapBasedOnPrevious(unemploymentMap, Collections.max(dowJonesClosingMap.keySet()));
-            fillMapBasedOnPrevious(civilianParticipationMap, Collections.max(dowJonesClosingMap.keySet()));
-            fillMapBasedOnPrevious(bankBorrowingMap, Collections.max(bankBorrowingMap.keySet()));
-            for (int i = 0; i < Collections.max(dowJonesClosingMap.keySet()); i++) {
+            fillMapBasedOnPrevious(unemploymentMap, Collections.max(currentStockClosingMap.keySet()));
+            fillMapBasedOnPrevious(civilianParticipationMap, Collections.max(currentStockClosingMap.keySet()));
+            fillMapBasedOnPrevious(bankBorrowingMap, Collections.max(currentStockClosingMap.keySet()));
+            for (int i = 0; i < Collections.max(currentStockClosingMap.keySet()); i++) {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(startDate);
                 cal.add(Calendar.DAY_OF_MONTH, i+1);
                 if (i == 0){
-                    allDataByDateList.add(new DataSample(cal.getTime(), dowJonesClosingMap.get(i), 0.0,
+                    allDataByDateList.add(new DataSample(cal.getTime(), currentStockClosingMap.get(i),
+                            0.0, dowJonesClosingMap.get(i), 0.0,
                             unemploymentMap.get(i), 0.0, civilianParticipationMap.get(i),
                             0.0, bankBorrowingMap.get(i), 0.0));
                 } else {
+                    if(dowJonesClosingMap.get(i) == null){
+                        System.out.println("uh oh");
+                    }
                     double previousDowValue = allDataByDateList.get(i - 1).dowJonesClosing;
                     double previousUnemploymentRateValue = allDataByDateList.get(i - 1).unemploymentRate;
                     double previousCivilianParticipationRateValue = allDataByDateList.get(i - 1).civilianParticipationRate;
                     double previousBankBorrowingValue = allDataByDateList.get(i - 1).moneyBorrowed;
+                    double previousCurrentStockValue = allDataByDateList.get(i - 1).currentStockClosing;
+                    double currentStockClosingPercentChange = (currentStockClosingMap.get(i) - previousCurrentStockValue) / previousCurrentStockValue * 100.0;
                     double dowJonesClosingPercentChange = (dowJonesClosingMap.get(i) - previousDowValue) / previousDowValue * 100.0;
                     double unemploymentRatePercentChange = (unemploymentMap.get(i) - previousUnemploymentRateValue) / previousUnemploymentRateValue * 100.0;
                     double civilianParticipationRateChange = (civilianParticipationMap.get(i) - previousCivilianParticipationRateValue)
                             / previousCivilianParticipationRateValue * 100.0;
                     double bankBorrowingChange = (bankBorrowingMap.get(i) - previousBankBorrowingValue)
                             / previousBankBorrowingValue * 100.0;
-                    allDataByDateList.add(new DataSample(cal.getTime(), dowJonesClosingMap.get(i), dowJonesClosingPercentChange,
+                    allDataByDateList.add(new DataSample(cal.getTime(), currentStockClosingMap.get(i),
+                            currentStockClosingPercentChange, dowJonesClosingMap.get(i), dowJonesClosingPercentChange,
                             unemploymentMap.get(i), unemploymentRatePercentChange, civilianParticipationMap.get(i),
                             civilianParticipationRateChange, bankBorrowingMap.get(i), bankBorrowingChange));
+                    //System.out.println(i);
                 }
             }
         } catch (FileNotFoundException ex) {
-            logger.error("File " + filenameDowData + " not found: " + ex.getMessage());
+            String message = "File " + filenameDowData + " not found: " + ex.getMessage();
             ex.printStackTrace();
+            throw new Exception(message, ex);
         } catch (IOException ex) {
             ex.printStackTrace();
+            String message = "io error: " + ex.getMessage();
+            logger.error(message);
+            throw new Exception(message, ex);
         } catch (Exception ex) {
             ex.printStackTrace();
+            String message = "unknown error: " + ex.getMessage();
+            logger.error(message);
+            throw new Exception(message, ex);
         } finally {
             if (br != null) {
                 try {
@@ -245,6 +313,9 @@ public class InputData {
                 j++;
             }
             int daysBetween = j + 1;
+            if (map.get(i+j) == null || map.get(lastKnownKey) == null) {
+                System.out.println("uh oh");
+            }
             double slope = (map.get(i + j) - map.get(lastKnownKey)) / daysBetween;
             map.put(i, slope * (i - lastKnownKey) + map.get(lastKnownKey));
             logger.trace("added day " + i + " with value " + map.get(i + j));
@@ -278,16 +349,20 @@ public class InputData {
     /**
      * offload full dow jones into excel with date as days after start
      */
-    public static void printFullDowJonesClosing() {
+    public static void printFullInformation() {
         try (PrintWriter writer = new PrintWriter(new File("allData.csv"))) {
             int i=0;
             StringBuilder headSb = new StringBuilder();
-            headSb.append("date, DJ close, DJ % change, Unemployment, Unemployment % change, civilian rate, civilian % change, bank borrowing, bank borrowing % change\n");
+            headSb.append("date, stock to analyze, stock % change, DJ close, DJ % change, Unemployment, Unemployment % change, civilian rate, civilian % change, bank borrowing, bank borrowing % change\n");
             writer.write(headSb.toString());
             for (DataSample sample : allDataByDateList) {
 
                 StringBuilder sb = new StringBuilder();
                 sb.append(sample.date.toString());
+                sb.append(',');
+                sb.append(sample.currentStockClosing);
+                sb.append(',');
+                sb.append(sample.currentStockClosingPercent);
                 sb.append(',');
                 sb.append(sample.dowJonesClosing);
                 sb.append(',');

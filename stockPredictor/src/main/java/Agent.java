@@ -5,15 +5,17 @@ import java.util.LinkedList;
 
 public class Agent {
     public enum WeightNameEnum {
-        DOWCLOSING(0),
-        DOWCLOSINGPERCENTCHANGE(1),
-        UNEMPLOYMENTRATE(2),
-        UNEMPLOYMENTRATECHANGE(3),
-        LABORRATE(4),
-        LABORRATEPERCENTCHANGE(5),
-        BORROWEDMONEY(6),
-        BORROWEDMONEYPERCENTCHANGE(7),
-        OFFSET(8);
+        CURRENTSTOCKCLOSING(0),
+        CURRENTSTOCKPERCENTCHANGE(1),
+        DOWCLOSING(2),
+        DOWCLOSINGPERCENTCHANGE(3),
+        UNEMPLOYMENTRATE(4),
+        UNEMPLOYMENTRATECHANGE(5),
+        LABORRATE(6),
+        LABORRATEPERCENTCHANGE(7),
+        BORROWEDMONEY(8),
+        BORROWEDMONEYPERCENTCHANGE(9),
+        OFFSET(10);
 
         private final int value;
         private WeightNameEnum(int value) {
@@ -24,7 +26,7 @@ public class Agent {
     static final int WEIGHT_SIZE = WeightNameEnum.values().length;
 
     private Weight[] weights = new Weight[WEIGHT_SIZE];
-    private double fitnessValueDowPrediction = 0;
+    private double fitnessValue = 0;
     private double standardDeviation = Double.POSITIVE_INFINITY;
     final static Logger logger = Logger.getLogger(Agent.class);
 
@@ -37,11 +39,11 @@ public class Agent {
         for (int i=0; i<WEIGHT_SIZE; i++) {
             this.weights[i] = weights[i];
         }
-        this.fitnessValueDowPrediction = calculateFitnessPredictingDow();
-        logger.trace("new agent created with fitness value " + fitnessValueDowPrediction);
+        this.fitnessValue = calculateFitness();
+        logger.trace("new agent created with fitness value " + fitnessValue);
     }
 
-    private double calculateFitnessPredictingDow() {
+    private double calculateFitness() {
         LinkedList<DataSample> allData = InputData.getAllDataList();
 
         double totalDifference = 0;
@@ -55,6 +57,8 @@ public class Agent {
             i++;
             if (i == 0)
             {
+                prevData[WeightNameEnum.CURRENTSTOCKCLOSING.value] = dataSample.currentStockClosing;
+                prevData[WeightNameEnum.CURRENTSTOCKPERCENTCHANGE.value] = 0.0;
                 prevData[WeightNameEnum.DOWCLOSING.value] = dataSample.dowJonesClosing;
                 prevData[WeightNameEnum.DOWCLOSINGPERCENTCHANGE.value] = 0.0;
                 prevData[WeightNameEnum.UNEMPLOYMENTRATE.value] = dataSample.unemploymentRate;
@@ -66,14 +70,16 @@ public class Agent {
                 continue;
             }
 
-            double estimatedPercentIncrease = getOffset().findValue();
+            double estimatedPercentIncrease = getWeight(WeightNameEnum.OFFSET).findValue();
             for (int j=0; j<WEIGHT_SIZE-1; j++) {
                 estimatedPercentIncrease += weights[j].findValue() * prevData[j];
             }
-            double actualDowPercentIncrease = (dataSample.dowJonesClosing - prevData[WeightNameEnum.DOWCLOSING.value]) / prevData[WeightNameEnum.DOWCLOSING.value] * 100.0;
-            double error = Math.abs(estimatedPercentIncrease - actualDowPercentIncrease);
+            double actualPercentIncrease = dataSample.currentStockClosingPercent;
+            double error = Math.abs(estimatedPercentIncrease - actualPercentIncrease);
             totalDifference += error;
             differences[i] = error;
+            prevData[WeightNameEnum.CURRENTSTOCKCLOSING.value] = dataSample.currentStockClosing;
+            prevData[WeightNameEnum.CURRENTSTOCKPERCENTCHANGE.value] = dataSample.currentStockClosingPercent;
             prevData[WeightNameEnum.DOWCLOSING.value] = dataSample.dowJonesClosing;
             prevData[WeightNameEnum.DOWCLOSINGPERCENTCHANGE.value] = dataSample.dowJonesClosingPercent;
             prevData[WeightNameEnum.UNEMPLOYMENTRATE.value] = dataSample.unemploymentRate;
@@ -83,12 +89,12 @@ public class Agent {
             prevData[WeightNameEnum.BORROWEDMONEY.value] = dataSample.moneyBorrowed;
             prevData[WeightNameEnum.BORROWEDMONEYPERCENTCHANGE.value] = dataSample.moneyBorrowedPercentChange;
         }
-        fitnessValueDowPrediction = totalDifference / ((double) allData.size());
-        if (fitnessValueDowPrediction == Double.POSITIVE_INFINITY) {
-            fitnessValueDowPrediction = Double.MAX_VALUE;
+        fitnessValue = totalDifference / ((double) allData.size());
+        if (fitnessValue == Double.POSITIVE_INFINITY) {
+            fitnessValue = Double.MAX_VALUE;
         }
-        calculateStandardDeviation(differences, fitnessValueDowPrediction);
-        return fitnessValueDowPrediction;
+        calculateStandardDeviation(differences, fitnessValue);
+        return fitnessValue;
     }
 
     private void calculateStandardDeviation(double[] differences, double mean) {
@@ -100,45 +106,12 @@ public class Agent {
     }
 
 
-    public double getFitnessValueDowPrediction() {
-        return fitnessValueDowPrediction;
+    public double getFitnessValue() {
+        return fitnessValue;
     }
 
-    public Weight getLastDowClosingMultiplier() {
-        return weights[WeightNameEnum.DOWCLOSING.value];
-    }
-
-    public Weight getLastDowClosingPercentMultiplier() {
-        return weights[WeightNameEnum.DOWCLOSINGPERCENTCHANGE.value];
-    }
-
-    public Weight getLastUnemploymentRateMultiplier() {
-        return weights[WeightNameEnum.UNEMPLOYMENTRATE.value];
-    }
-
-    public Weight getLastUnemploymentRatePercentChangeMultiplier() {
-        return weights[WeightNameEnum.UNEMPLOYMENTRATECHANGE.value];
-    }
-
-    public Weight getLastCivilianParticipationRateMultiplier() {
-        return weights[WeightNameEnum.LABORRATE.value];
-    }
-
-    public Weight getLastCivilianParticipationRateChangeMultiplier() {
-        return weights[WeightNameEnum.LABORRATEPERCENTCHANGE.value];
-    }
-
-    public Weight getBorrowedMoneyMultiplier() {
-        return weights[WeightNameEnum.BORROWEDMONEY.value];
-    }
-
-    public Weight getBorrowedMoneyRateChangeMultiplier() {
-        return weights[WeightNameEnum.BORROWEDMONEYPERCENTCHANGE.value];
-    }
-
-
-    public Weight getOffset() {
-        return weights[WeightNameEnum.OFFSET.value];
+    public Weight getWeight(WeightNameEnum weightName) {
+        return weights[weightName.value];
     }
 
     public double getStandardDeviation() {

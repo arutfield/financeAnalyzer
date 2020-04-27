@@ -1,6 +1,7 @@
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class AgentTest {
 
@@ -8,9 +9,9 @@ public class AgentTest {
     public void findFitnessFunctionWeight0() throws Exception {
         setupInputTest();
 
-        Agent agent = new Agent(new Weight[]{getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(),
+        Agent agent = new Agent(new Weight[]{getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(),
                 getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight()});
-        assertEquals(0.498675, agent.getFitnessValueDowPrediction(), 1);
+        assertEquals(0.498675, agent.getFitnessValue(), 1);
 
     }
 
@@ -28,17 +29,21 @@ public class AgentTest {
         Weight weight = new Weight(false, ones, tenths, hundredths, thousandths, tenThousandths, hundredThousandths, millionths, tenMillionths);
 
 
-        Agent agent = new Agent(new Weight[]{weight, getEmptyWeight(), getEmptyWeight(), getEmptyWeight(),
+        Agent agent = new Agent(new Weight[]{weight, getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(),
                 getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight(), getEmptyWeight()});
-        assertEquals(991.3215518, agent.getFitnessValueDowPrediction(), 1);
+        assertEquals(5.929342, agent.getFitnessValue(), 1e-5);
 
     }
 
     private void setupInputTest(){
-        InputData.loadFiles("target\\classes\\DJI.csv",
-                "target\\classes\\UNRATE.csv",
-                "target\\classes\\CIVPART.csv",
-                "target\\classes\\bankBorrowing.csv");
+        try {
+            InputData.loadFiles("target\\classes\\FDN.csv","target\\classes\\DJI.csv",
+                    "target\\classes\\UNRATE.csv",
+                    "target\\classes\\CIVPART.csv",
+                    "target\\classes\\bankBorrowing.csv");
+        } catch (Exception e) {
+            assertFalse(true);
+        }
 
     }
 
