@@ -44,10 +44,10 @@ class DataSample {
  */
 public class InputData {
     private static Date startDate;
+    private static Date endDate;
     private final static Logger logger = Logger.getLogger(InputData.class);
-//    private static LinkedList<Double> dowJonesClosingList = new LinkedList<>();
- //   private static Map<Integer, Double> dowJonesClosingMapChangePercent = new HashMap<>();
     private static LinkedList<DataSample> allDataByDateList = new LinkedList<>();
+    private static String currentStockFilename = "";
     /**
      * constructor
      */
@@ -67,7 +67,7 @@ public class InputData {
         String cvsSplitBy = ",";
 
         try {
-
+            currentStockFilename = currentStockFile;
             //read in current stock to analyze data
             brCs = new BufferedReader(new FileReader(currentStockFile));
             int dateDifference = -1;
@@ -83,8 +83,7 @@ public class InputData {
                 String dateOfStock = data[0];
 
                 int prevDateDifference = dateDifference;
-
-                Date date1;
+                Date date1 = null;
                 try {
                     date1 = new SimpleDateFormat("yyyy-MM-dd").parse(dateOfStock);
                 } catch (ParseException ex) {
@@ -101,6 +100,7 @@ public class InputData {
 
                 }
                 dateDifference = (int) ((date1.getTime() - startDate.getTime()) / (1000.0 * 60 * 60 * 24));
+                endDate = date1;
                 currentStockClosingMap.put(dateDifference, Double.valueOf(data[4]));
                 logger.trace("added day " + dateDifference + " for " + date1.toString() + ", "
                         + currentStockClosingMap.get(dateDifference)
@@ -395,4 +395,15 @@ public class InputData {
         return allDataByDateList;
     }
 
+    public static String getCurrentStockFileName() {
+        return currentStockFilename;
+    }
+
+    public static Date getStartDate() {
+        return startDate;
+    }
+
+    public static Date getEndDate() {
+        return endDate;
+    }
 }

@@ -1,5 +1,11 @@
 import org.apache.log4j.Logger;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 
 public class Population {
@@ -58,7 +64,7 @@ public class Population {
         for (int i=0; i<numberOfGenerations; i++) {
             generateChildren(numberOfChildren);
         }
-        return findBestAgent();
+        return getBestAgent();
     }
 
     /**
@@ -75,13 +81,13 @@ public class Population {
 
             logger.debug("generation: " + i);
             generateChildren(numberOfChildren);
-            if (findBestAgent().getFitnessValue() < goalValue) {
-                return findBestAgent();
+            if (getBestAgent().getFitnessValue() < goalValue) {
+                return getBestAgent();
 
             }
         }
         logger.warn("unable to reach goal of cost " + goalValue + " in " + maximumNumberOfGenerations + ". Returning best");
-        return findBestAgent();
+        return getBestAgent();
     }
 
     /**
@@ -89,7 +95,7 @@ public class Population {
      *
      * @return best agent
      */
-    public Agent findBestAgent() {
+    public Agent getBestAgent() {
         return agents.get(0);
     }
 
@@ -189,28 +195,6 @@ public class Population {
                         crossPoints[j], mutationProbability);
                 j++;
             }
-        /*    Weight newDowMultiplier = new Weight(parents[0].getWeight(Agent.WeightNameEnum.DOWCLOSING),
-                        parents[1].getLastDowClosingMultiplier(), crossPoints[0], mutationProbability);
-                Weight newDowPercentMultiplier = new Weight(parents[0].getLastDowClosingPercentMultiplier(),
-                        parents[1].getLastDowClosingPercentMultiplier(), crossPoints[1], mutationProbability);
-                Weight newUnemploymentRateMultiplier = new Weight(parents[0].getLastUnemploymentRateMultiplier(),
-                        parents[1].getLastUnemploymentRateMultiplier(), crossPoints[2], mutationProbability);
-            Weight newUnemploymentRatePercentChangeMultiplier = new Weight(parents[0].getLastUnemploymentRatePercentChangeMultiplier(),
-                    parents[1].getLastUnemploymentRatePercentChangeMultiplier(), crossPoints[3], mutationProbability);
-            Weight newCivilianRateMultiplier = new Weight(parents[0].getLastCivilianParticipationRateMultiplier(),
-                    parents[1].getLastCivilianParticipationRateMultiplier(), crossPoints[4], mutationProbability);
-            Weight newCivilianRatePercentChangeMultiplier = new Weight(parents[0].getLastCivilianParticipationRateChangeMultiplier(),
-                    parents[1].getLastCivilianParticipationRateChangeMultiplier(), crossPoints[5], mutationProbability);
-            Weight newBorrowedMultiplier = new Weight(parents[0].getBorrowedMoneyMultiplier(),
-                    parents[1].getBorrowedMoneyMultiplier(), crossPoints[6], mutationProbability);
-            Weight newBorrowedPercentChangeMultiplier = new Weight(parents[0].getBorrowedMoneyRateChangeMultiplier(),
-                    parents[1].getBorrowedMoneyRateChangeMultiplier(), crossPoints[7], mutationProbability);
-            Weight newOffset = new Weight(parents[0].getOffset(),
-                    parents[1].getOffset(), crossPoints[8], mutationProbability);
-            Weight[] weights = {newDowMultiplier, newDowPercentMultiplier, newUnemploymentRateMultiplier,
-                    newUnemploymentRatePercentChangeMultiplier, newCivilianRateMultiplier,
-                    newCivilianRatePercentChangeMultiplier, newBorrowedMultiplier, newBorrowedPercentChangeMultiplier,
-                    newOffset};*/
 
             Agent agent = new Agent(weights);
             //replace worst agent that hasn't been replaced yet
@@ -218,4 +202,61 @@ public class Population {
         }
         orderAgentsByFitness();
     }
+
+    public void printBestAgent(int generations, int numberOfChildren) {
+        logger.info("printing best agent to file");
+        String filenameFull = InputData.getCurrentStockFileName();
+        int endIndex = filenameFull.indexOf(".");
+        String filename;
+        if (endIndex != -1)
+        {
+            filename = filenameFull.substring(0 , endIndex);
+        } else {
+            filename = filenameFull;
+        }
+
+
+        try (PrintWriter writer = new PrintWriter(new File(filename + "_Analysis.csv"))) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(InputData.getStartDate());
+            cal.add(Calendar.DATE, 1);
+            Date roundedStart = cal.getTime();
+            SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+            StringBuilder headSb = new StringBuilder();
+            headSb.append("Result of analyzing stock " + filename + " with " + generations + " generations and " + numberOfChildren + " per generation\n");
+            headSb.append("Data started on " + formatter.format(roundedStart) + " and finished on " + formatter.format(InputData.getEndDate()) + "\n");
+            writer.write(headSb.toString());
+
+            //heading of weights
+            StringBuilder weightNameSb = new StringBuilder();
+            for (Agent.WeightNameEnum weightNameEnum : Agent.WeightNameEnum.values()) {
+                weightNameSb.append(weightNameEnum.toString());
+                if (weightNameEnum.ordinal() < Agent.WeightNameEnum.values().length - 1) {
+                    weightNameSb.append(", ");
+                }
+            }
+            weightNameSb.append("\n");
+            writer.write(weightNameSb.toString());
+
+            StringBuilder weightValuesSb = new StringBuilder();
+            Agent bestAgent = getBestAgent();
+            for (Agent.WeightNameEnum weightNameEnum : Agent.WeightNameEnum.values()) {
+                weightValuesSb.append(bestAgent.getWeight(weightNameEnum).findValue());
+                if (weightNameEnum.ordinal() < Agent.WeightNameEnum.values().length - 1) {
+                    weightValuesSb.append(", ");
+                }
+            }
+            weightValuesSb.append("\n");
+            writer.write(weightValuesSb.toString());
+
+            StringBuilder footerSb = new StringBuilder();
+            Date currentDate = new Date();
+            footerSb.append("Analysis completed on " + currentDate.toString());
+            writer.write(footerSb.toString());
+        } catch (FileNotFoundException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+
+    }
+
 }

@@ -6,7 +6,7 @@ public class PopulationTest {
     @Test
     public void createPopulation() throws Exception {
         Population population = createPopulation( 10000);
-        Agent agent = population.findBestAgent();
+        Agent agent = population.getBestAgent();
         System.out.println("best agent weight: " + agent.getWeight(Agent.WeightNameEnum.DOWCLOSING).printWeightValue());
         assertTrue(true);
     }

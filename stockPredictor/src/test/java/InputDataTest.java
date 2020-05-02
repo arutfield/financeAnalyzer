@@ -169,6 +169,11 @@ public class InputDataTest {
     private void setupInputTest(){
         try {
             InputData.loadFiles("target\\classes\\FDN.csv", "target\\classes\\DJI.csv", "target\\classes\\UNRATE.csv", "target\\classes\\CIVPART.csv", "target\\classes\\bankBorrowing.csv");
+            String startDateString = InputData.getStartDate().toString();
+            assertTrue(startDateString.contains( "Jun 22 "));
+            assertTrue(startDateString.contains("2006"));
+            assertTrue(InputData.getEndDate().toString().contains("Feb 21"));
+            assertTrue(InputData.getEndDate().toString().contains("2020"));
         } catch(Exception ex) {
             assertFalse(true);
         }
