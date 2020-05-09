@@ -55,14 +55,14 @@ public class Population {
         orderAgentsByFitness();
     }
 
-    public Agent getBestOfGenerations(int numberOfGenerations, int numberOfChildren) throws Exception {
+    public Agent getBestOfGenerations(int numberOfGenerations, int numberOfChildren, double mutationProbability) throws Exception {
         if (numberOfGenerations < 1) {
             String message = "need at least one generation, have " + numberOfGenerations;
             logger.error(message);
             throw new Exception(message);
         }
         for (int i=0; i<numberOfGenerations; i++) {
-            generateChildren(numberOfChildren);
+            generateChildren(numberOfChildren, mutationProbability);
         }
         return getBestAgent();
     }
@@ -75,12 +75,12 @@ public class Population {
      * @return best agent at end
      * @throws Exception error
      */
-    public Agent getGoalFitnessFunction(double goalValue, int numberOfChildren, int maximumNumberOfGenerations) throws Exception {
+    public Agent getGoalFitnessFunction(double goalValue, int numberOfChildren, int maximumNumberOfGenerations, double mutationProbability) throws Exception {
 
         for (int i=0; i<maximumNumberOfGenerations; i++) {
 
             logger.debug("generation: " + i);
-            generateChildren(numberOfChildren);
+            generateChildren(numberOfChildren, mutationProbability);
             if (getBestAgent().getFitnessValue() < goalValue) {
                 return getBestAgent();
 
@@ -178,9 +178,8 @@ public class Population {
      * @param numberOfChildren number of children to generate
      * @throws Exception error
      */
-    public void generateChildren(int numberOfChildren) throws Exception {
+    public void generateChildren(int numberOfChildren, double mutationProbability) throws Exception {
         Agent[] parents = findFittestPair();
-        double mutationProbability = 0.1;
 
         for (int i = 0; i < numberOfChildren; i++) {
             int[] crossPoints = new int[Agent.WEIGHT_SIZE];
@@ -203,7 +202,7 @@ public class Population {
         orderAgentsByFitness();
     }
 
-    public void printBestAgent(int generations, int numberOfChildren) {
+    public void printBestAgent(int generations, int numberOfChildren, double mutationProbability) {
         logger.info("printing best agent to file");
         String filenameFull = InputData.getCurrentStockFileName();
         int endIndex = filenameFull.indexOf(".");
@@ -223,7 +222,8 @@ public class Population {
             Date roundedStart = cal.getTime();
             SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
             StringBuilder headSb = new StringBuilder();
-            headSb.append("Result of analyzing stock " + filename + " with " + generations + " generations and " + numberOfChildren + " per generation\n");
+            headSb.append("Result of analyzing stock " + filename + " with " + generations + " generations, "
+                    + numberOfChildren + " per generation, mutation probability of " + mutationProbability + "\n");
             headSb.append("Data started on " + formatter.format(roundedStart) + " and finished on " + formatter.format(InputData.getEndDate()) + "\n");
             writer.write(headSb.toString());
 
@@ -231,10 +231,12 @@ public class Population {
             StringBuilder weightNameSb = new StringBuilder();
             for (Agent.WeightNameEnum weightNameEnum : Agent.WeightNameEnum.values()) {
                 weightNameSb.append(weightNameEnum.toString());
-                if (weightNameEnum.ordinal() < Agent.WeightNameEnum.values().length - 1) {
-                    weightNameSb.append(", ");
-                }
+                weightNameSb.append(", ");
             }
+
+            weightNameSb.append("MEAN ERROR");
+            weightNameSb.append(",");
+            weightNameSb.append("STANDARD DEV");
             weightNameSb.append("\n");
             writer.write(weightNameSb.toString());
 
@@ -242,10 +244,9 @@ public class Population {
             Agent bestAgent = getBestAgent();
             for (Agent.WeightNameEnum weightNameEnum : Agent.WeightNameEnum.values()) {
                 weightValuesSb.append(bestAgent.getWeight(weightNameEnum).findValue());
-                if (weightNameEnum.ordinal() < Agent.WeightNameEnum.values().length - 1) {
-                    weightValuesSb.append(", ");
-                }
+                weightValuesSb.append(", ");
             }
+            weightValuesSb.append(bestAgent.getFitnessValue() + "," + bestAgent.getStandardDeviation());
             weightValuesSb.append("\n");
             writer.write(weightValuesSb.toString());
 

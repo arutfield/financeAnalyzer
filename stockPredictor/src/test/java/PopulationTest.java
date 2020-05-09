@@ -121,7 +121,7 @@ public class PopulationTest {
         Population population = createPopulation(600);
         InputData.printFullInformation();
         double goalValue = 0.7251;
-        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 400, 4000);
+        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 400, 4000, 0.1);
         assertTrue(bestAgent.getFitnessValue() <= goalValue);
     }
 
@@ -132,7 +132,7 @@ public class PopulationTest {
         Population population = new Population("target\\classes\\constantDow.csv",
                 "target\\classes\\constantDow.csv", "target\\classes\\UNRATE.csv",
                 "target\\classes\\CIVPART.csv", "target\\classes\\bankBorrowing.csv", 500);;
-        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
+        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000, 0.1);
         assertTrue(bestAgent.getFitnessValue() <= goalValue);
         for (Agent.WeightNameEnum weightNameEnum : Agent.WeightNameEnum.values()) {
             assertEquals(bestAgent.getWeight(weightNameEnum).findValue(), 0, 1e-7);
@@ -156,7 +156,7 @@ public class PopulationTest {
         weights[Agent.WeightNameEnum.DOWCLOSING.ordinal()] = new Weight(false, zeroByte, zeroByte, zeroByte,  zeroByte,  zeroByte, zeroByte, (byte) 1, zeroByte);
         Agent goodAgent = new Agent(weights);
         population.addAgent(goodAgent);
-        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
+        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000, 0.1);
         assertTrue(bestAgent.getFitnessValue() <= goalValue);
         assertEquals(bestAgent, goodAgent);
     }
@@ -177,7 +177,7 @@ public class PopulationTest {
         weights[1] = new Weight(false, (byte) 1, zeroByte, zeroByte, zeroByte,  zeroByte, zeroByte, zeroByte, zeroByte);
         Agent goodAgent = new Agent(weights);
         population.addAgent(goodAgent);
-        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
+        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000, 0.1);
         assertTrue(bestAgent.getFitnessValue() <= goalValue);
         assertEquals(bestAgent, goodAgent);
     }
@@ -198,7 +198,7 @@ public class PopulationTest {
         weights[Agent.WeightNameEnum.UNEMPLOYMENTRATE.ordinal()] = new Weight(false, zeroByte, (byte) 1, zeroByte, zeroByte,  zeroByte,  zeroByte, zeroByte,  zeroByte);
         Agent goodAgent = new Agent(weights);
         population.addAgent(goodAgent);
-        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
+        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000, 0.1);
         assertTrue(bestAgent.getFitnessValue() <= goalValue);
         assertEquals(bestAgent, goodAgent);
     }
@@ -218,7 +218,7 @@ public class PopulationTest {
         weights[Agent.WeightNameEnum.UNEMPLOYMENTRATECHANGE.ordinal()] = new Weight(false, (byte) 2,  zeroByte,zeroByte, zeroByte,  zeroByte,  zeroByte, zeroByte,  zeroByte);
         Agent goodAgent = new Agent(weights);
         population.addAgent(goodAgent);
-        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
+        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000, 0.1);
         assertTrue(bestAgent.getFitnessValue() <= goalValue);
         assertEquals(bestAgent, goodAgent);
     }
@@ -237,7 +237,7 @@ public class PopulationTest {
         weightArray[Agent.WeightNameEnum.LABORRATE.ordinal()] = new Weight(false, zeroByte, zeroByte, (byte) 1, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte);
         Agent goodAgent = new Agent(weightArray);
         population.addAgent(goodAgent);
-        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
+        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000, 0.1);
         assertTrue(bestAgent.getFitnessValue() <= goalValue);
         assertEquals(bestAgent, goodAgent);
     }
@@ -256,7 +256,7 @@ public class PopulationTest {
         weightArray[Agent.WeightNameEnum.LABORRATEPERCENTCHANGE.ordinal()] = new Weight(true, (byte) 5, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte);
         Agent goodAgent = new Agent(weightArray);
         population.addAgent(goodAgent);
-        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
+        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000, 0.1);
         assertTrue(bestAgent.getFitnessValue() <= goalValue);
         assertEquals(bestAgent, goodAgent);
 
@@ -276,7 +276,7 @@ public class PopulationTest {
         weightArray[Agent.WeightNameEnum.BORROWEDMONEY.ordinal()] = new Weight(false,  zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, zeroByte, (byte) 7, (byte) 1);
         Agent goodAgent = new Agent(weightArray);
         population.addAgent(goodAgent);
-        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
+        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000, 0.1);
         assertTrue(bestAgent.getFitnessValue() <= goalValue);
         assertEquals(bestAgent, goodAgent);
     }
@@ -295,7 +295,7 @@ public class PopulationTest {
         weightArray[Agent.WeightNameEnum.BORROWEDMONEYPERCENTCHANGE.ordinal()] = new Weight(true,  zeroByte, zeroByte, (byte) 3, (byte) 2, zeroByte, zeroByte, zeroByte, zeroByte);
         Agent goodAgent = new Agent(weightArray);
         population.addAgent(goodAgent);
-        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
+        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000, 0.1);
         assertTrue(bestAgent.getFitnessValue() <= goalValue);
         assertEquals(bestAgent, goodAgent);
     }
@@ -316,7 +316,7 @@ public class PopulationTest {
         weightArray[Agent.WeightNameEnum.BORROWEDMONEYPERCENTCHANGE.ordinal()] = new Weight(true,  zeroByte, zeroByte, (byte) 3, (byte) 2, zeroByte, zeroByte, zeroByte, zeroByte);
         Agent goodAgent = new Agent(weightArray);
         population.addAgent(goodAgent);
-        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
+        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000, 0.1);
         assertTrue(bestAgent.getFitnessValue() <= goalValue);
         assertEquals(bestAgent, goodAgent);
     }
@@ -336,7 +336,7 @@ public class PopulationTest {
         weights[Agent.WeightNameEnum.OFFSET.ordinal()] = new Weight(false, zeroByte, (byte) 1,  zeroByte, zeroByte,  zeroByte, zeroByte, zeroByte, zeroByte);
         Agent goodAgent = new Agent(weights);
         population.addAgent(goodAgent);
-        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000);
+        Agent bestAgent = population.getGoalFitnessFunction(goalValue, 300, 10000, 0.1);
         assertTrue(bestAgent.getFitnessValue() <= goalValue);
         assertEquals(bestAgent, goodAgent);
     }

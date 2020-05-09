@@ -69,9 +69,14 @@ public class InputData {
         try {
             currentStockFilename = currentStockFile;
             //read in current stock to analyze data
-            brCs = new BufferedReader(new FileReader(currentStockFile));
+            InputStream inCs = InputData.class.getClassLoader().getResourceAsStream(currentStockFile);
+            if (inCs != null) {
+                brCs = new BufferedReader(new InputStreamReader(inCs));
+            } else {
+                brCs = new BufferedReader(new FileReader(currentStockFile));
+            }
             int dateDifference = -1;
-            Map<Integer, Double> currentStockClosingMap = new HashMap<Integer, Double>();
+            Map<Integer, Double> currentStockClosingMap = new HashMap<>();
             while ((line = brCs.readLine()) != null) {
 
                 // use comma as separator
@@ -115,7 +120,12 @@ public class InputData {
 
 
             //read in dow data
-            br = new BufferedReader(new FileReader(filenameDowData));
+            InputStream ins = InputData.class.getClassLoader().getResourceAsStream(filenameDowData);
+            if (ins != null) {
+                br = new BufferedReader(new InputStreamReader(ins));
+            } else {
+                br = new BufferedReader(new FileReader(filenameDowData));
+            }
             dateDifference = -1;
             Map<Integer, Double> dowJonesClosingMap = new HashMap<Integer, Double>();
             while ((line = br.readLine()) != null) {
@@ -158,16 +168,20 @@ public class InputData {
 
             //read in unemployment data
 
-            brUE = new BufferedReader(new FileReader(unemploymentDataFileName));
-            dateDifference = -1;
+            InputStream inUE = InputData.class.getClassLoader().getResourceAsStream(unemploymentDataFileName);
             Map<Integer, Double> unemploymentMap = new HashMap<Integer, Double>();
+            if (inUE != null) {
+                brUE = new BufferedReader(new InputStreamReader(inUE));
+            } else {
+                brUE = new BufferedReader(new FileReader(unemploymentDataFileName));
+            }
+
             while ((line = brUE.readLine()) != null) {
 
                 // use comma as separator
                 String[] data = line.split(cvsSplitBy);
                 String dateOfUnemployment = data[0];
                 try {
-                    int prevDateDifference = dateDifference;
                     Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(dateOfUnemployment);
 
                     dateDifference = (int) ((date1.getTime() - startDate.getTime()) / (1000.0 * 60 * 60 * 24));
@@ -175,7 +189,6 @@ public class InputData {
                     logger.trace("added unemployment " + dateDifference + " for " + date1.toString() + ", "
                             + unemploymentMap.get(dateDifference)
                             + " to map");
-                   // int dateRateOfChange = dateDifference - prevDateDifference;
                 } catch (ParseException ex) {
                     continue;
                 }
@@ -183,7 +196,13 @@ public class InputData {
 
 
             //read in civilian rate
-            brCv = new BufferedReader(new FileReader(civilianParticipationRateFileName));
+            InputStream inCv = InputData.class.getClassLoader().getResourceAsStream(civilianParticipationRateFileName);
+            if (inCv != null) {
+                brCv = new BufferedReader(new InputStreamReader(inCv));
+            } else {
+                brCv = new BufferedReader(new FileReader(civilianParticipationRateFileName));
+            }
+
             dateDifference = -1;
             Map<Integer, Double> civilianParticipationMap = new HashMap<Integer, Double>();
             while ((line = brCv.readLine()) != null) {
@@ -200,15 +219,18 @@ public class InputData {
                     logger.trace("added civilian participation " + dateDifference + " for " + date1.toString() + ", "
                             + civilianParticipationMap.get(dateDifference)
                             + " to map");
-                    //int dateRateOfChange = dateDifference - prevDateDifference;
                 } catch (ParseException ex) {
                     continue;
                 }
             }
 
-            //read in civilian rate
-            brbb = new BufferedReader(new FileReader(bankBorrowedFileName));
-            dateDifference = -1;
+            //read in bank borrowing rate
+            InputStream inbb = InputData.class.getClassLoader().getResourceAsStream(bankBorrowedFileName);
+            if (inbb != null) {
+                brbb = new BufferedReader(new InputStreamReader(inbb));
+            } else {
+                brbb = new BufferedReader(new FileReader(bankBorrowedFileName));
+            }
             Map<Integer, Double> bankBorrowingMap = new HashMap<Integer, Double>();
             while ((line = brbb.readLine()) != null) {
 
@@ -216,7 +238,6 @@ public class InputData {
                 String[] data = line.split(cvsSplitBy);
                 String dateOfUnemployment = data[0];
                 try {
-                    //int prevDateDifference = dateDifference;
                     Date date1 = new SimpleDateFormat("MM/dd/yyyy").parse(dateOfUnemployment);
 
                     dateDifference = (int) ((date1.getTime() - startDate.getTime()) / (1000.0 * 60 * 60 * 24));
@@ -224,7 +245,6 @@ public class InputData {
                     logger.trace("added bank borrowing " + dateDifference + " for " + date1.toString() + ", "
                             + bankBorrowingMap.get(dateDifference)
                             + " to map");
-                    //int dateRateOfChange = dateDifference - prevDateDifference;
                 } catch (ParseException ex) {
                     continue;
                 }
@@ -246,9 +266,6 @@ public class InputData {
                             unemploymentMap.get(i), 0.0, civilianParticipationMap.get(i),
                             0.0, bankBorrowingMap.get(i), 0.0));
                 } else {
-                    if(dowJonesClosingMap.get(i) == null){
-                        System.out.println("uh oh");
-                    }
                     double previousDowValue = allDataByDateList.get(i - 1).dowJonesClosing;
                     double previousUnemploymentRateValue = allDataByDateList.get(i - 1).unemploymentRate;
                     double previousCivilianParticipationRateValue = allDataByDateList.get(i - 1).civilianParticipationRate;
@@ -265,11 +282,10 @@ public class InputData {
                             currentStockClosingPercentChange, dowJonesClosingMap.get(i), dowJonesClosingPercentChange,
                             unemploymentMap.get(i), unemploymentRatePercentChange, civilianParticipationMap.get(i),
                             civilianParticipationRateChange, bankBorrowingMap.get(i), bankBorrowingChange));
-                    //System.out.println(i);
                 }
             }
         } catch (FileNotFoundException ex) {
-            String message = "File " + filenameDowData + " not found: " + ex.getMessage();
+            String message = "File not found: " + ex.getMessage();
             ex.printStackTrace();
             throw new Exception(message, ex);
         } catch (IOException ex) {
@@ -313,9 +329,6 @@ public class InputData {
                 j++;
             }
             int daysBetween = j + 1;
-            if (map.get(i+j) == null || map.get(lastKnownKey) == null) {
-                System.out.println("uh oh");
-            }
             double slope = (map.get(i + j) - map.get(lastKnownKey)) / daysBetween;
             map.put(i, slope * (i - lastKnownKey) + map.get(lastKnownKey));
             logger.trace("added day " + i + " with value " + map.get(i + j));
